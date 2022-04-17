@@ -1,0 +1,27 @@
+modLoader="javafml" #mandatory
+loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+license="SugarAPI, All rights reserved"
+[[mods]] #mandatory
+modId="sugarapi" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="SugarAPI" #mandatory
+logoFile="examplemod.png" #optional
+credits="Thanks to HTMLChannel and Klemjr's for support" #optional
+authors="Thana" #optional
+description='''
+SugarAPI is a main dependencies files use for many of mods.
+SugarAPI contains a lot of client and server setup features.
+Based to Thana mod.
+'''
+[[dependencies.sugarapi]] #optional
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[40,)" #mandatory
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.sugarapi]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="NONE"
+    side="BOTH"
