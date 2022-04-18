@@ -1,0 +1,25 @@
+package com.thana.sugarapi.client.config;
+
+import com.thana.sugarapi.common.core.SugarAPIConfigBuilder;
+import com.thana.sugarapi.common.utils.JsonConfig;
+
+public class ClientConfig {
+
+    private static final JsonConfig CONFIG = SugarAPIConfigBuilder.CONFIG;
+
+    public static void read(String modid) {
+        JsonConfig.readClient(modid);
+    }
+
+    public static String getModVersion(String modid) {
+        return JsonConfig.readClient(modid).get("version").getAsString();
+    }
+
+    public static boolean is(String key) {
+        return CONFIG.is(key);
+    }
+
+    public static int getInt(String key) {
+        return CONFIG.getInt(key);
+    }
+}
