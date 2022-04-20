@@ -1,20 +1,23 @@
 package com.thana.sugarapi.client.gui.screen;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.thana.sugarapi.client.config.ClientConfig;
+import com.thana.sugarapi.client.gui.widget.button.SliderButton;
+import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.JsonConfig;
+import com.thana.sugarapi.common.utils.JsonPrimitiveObject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FastColor;
-import net.minecraftforge.client.gui.widget.ForgeSlider;
+import net.minecraft.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,14 +26,17 @@ import java.util.List;
 public class SugarSettingsScreen extends Screen {
 
     public static final HashMap<String, String> ALL_CONFIG = new HashMap<>();
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final Minecraft mc = Minecraft.getInstance();
     private final List<Button> modSelectionButtons = new ArrayList<>();
-    private final List<Button> settingsButtons = new ArrayList<>();
+    private final List<Widget> settingsButtons = new ArrayList<>();
 
     private int buttonSize;
     private int editorX;
     private int editorY;
+    private int editorRight;
+    private int editorBottom;
     private String shownModId = "";
     private String errorMessage = null;
 
@@ -43,12 +49,15 @@ public class SugarSettingsScreen extends Screen {
         this.buttonSize = Math.min(this.width / 6, 80);
         this.editorX = this.width / 6 + this.buttonSize + 16;
         this.editorY = this.height / 7 - 4;
+        this.editorRight = this.width * 5 / 6 + 4;
+        this.editorBottom = this.height * 6 / 7 + 4;
         this.shownModId = "";
         this.errorMessage = null;
         this.modSelectionButtons.clear();
         this.settingsButtons.clear();
 
         this.addRenderableWidget(new Button(this.width / 6 - 30, this.height / 7, 20, 20, new TextComponent("\u27F3"), (button) -> {
+            JsonConfig.set(SugarAPI.MOD_ID, "lastConfigId", "");
             this.clearWidgets();
             this.init();
         }));
@@ -60,6 +69,12 @@ public class SugarSettingsScreen extends Screen {
             this.addRenderableWidget(button = new Button(this.width / 6, this.height / 7 + 16 + 24 * i, this.buttonSize, 20, new TextComponent(displayName), this::showConfig));
             this.modSelectionButtons.add(button);
             i++;
+        }
+
+        // Attempt Open Last Page
+        String lastOpenedId = JsonConfig.getLastOpenedId();
+        if (!lastOpenedId.isEmpty()) {
+            this.showConfig(lastOpenedId);
         }
     }
 
@@ -86,6 +101,13 @@ public class SugarSettingsScreen extends Screen {
                 this.font.drawShadow(poseStack, ChatFormatting.AQUA + key, this.editorX + 6, this.editorY + 12 + i * 24, 16777215);
                 i++;
             }
+        }
+
+        // Show Errors
+        if (!StringUtil.isNullOrEmpty(this.errorMessage)) {
+            int middleX = (this.editorRight + this.editorX) / 2;
+            int middleY = (this.editorBottom + this.editorY) / 2;
+            Gui.drawCenteredString(poseStack, this.font, this.errorMessage, middleX, middleY - this.font.lineHeight / 2, 16777215);
         }
     }
 
@@ -116,7 +138,28 @@ public class SugarSettingsScreen extends Screen {
                 modid = s;
             }
         }
+        this.showConfig(modName, modid);
+    }
+
+    private void showConfig(String modid) {
+        for (String s : ALL_CONFIG.keySet()) {
+            if (s.equals(modid)) {
+                String modName = ALL_CONFIG.get(s);
+                this.showConfig(modName, modid);
+                return;
+            }
+        }
+    }
+
+    private void showConfig(String modName, String modid) {
+        this.settingsButtons.clear();
+        for (String s : ALL_CONFIG.keySet()) {
+            if (ALL_CONFIG.get(s).equals(modName)) {
+                modid = s;
+            }
+        }
         if (modid != null) {
+            JsonConfig.set(SugarAPI.MOD_ID, "lastConfigId", modid);
             this.errorMessage = null;
             this.shownModId = modid;
             JsonObject object = JsonConfig.modifiableConfig(this.shownModId);
@@ -139,24 +182,34 @@ public class SugarSettingsScreen extends Screen {
 
                     // Boolean
                     if (primitive.isBoolean()) {
-                        this.addRenderableWidget(new Button(buttonX, buttonY, buttonWidth, 20, new TextComponent(primitive.getAsBoolean() ? ChatFormatting.GREEN + "YES" : ChatFormatting.RED + "NO"), (b) -> {
+                        Button button = new Button(buttonX, buttonY, buttonWidth, 20, new TextComponent(primitive.getAsBoolean() ? ChatFormatting.GREEN + "YES" : ChatFormatting.RED + "NO"), (b) -> {
                             boolean value = JsonConfig.modifiableConfig(finalModid).get(key).getAsBoolean();
                             JsonConfig.set(finalModid, key, !value);
                             b.setMessage(new TextComponent(!value ? ChatFormatting.GREEN + "YES" : ChatFormatting.RED + "NO"));
-                        }));
+                        });
+                        this.addRenderableWidget(button);
+                        this.settingsButtons.add(button);
                     }
 
                     // String
                     else if (primitive.isString()) {
-                        this.addRenderableWidget(new Button(buttonX, buttonY, buttonWidth, 20, new TextComponent("Simple Button"), (b) -> {}));
+                        EditBox box = new EditBox(this.font, buttonX + 1, buttonY, buttonWidth - 2, 18, TextComponent.EMPTY);
+                        box.setEditable(true);
+                        box.setCanLoseFocus(true);
+                        box.setMaxLength(32767);
+                        box.setValue(JsonConfig.modifiableConfig(modid).get(key).getAsString());
+                        box.setResponder((text) -> JsonConfig.set(finalModid, key, text));
+                        this.addRenderableWidget(box);
+                        this.settingsButtons.add(box);
                     }
 
                     // Number
+                    // TODO
                     else if (primitive.isNumber()) {
                         Number number = primitive.getAsNumber();
 
                         // Integer Value
-                        if (number instanceof Integer integer) {
+                        if (number instanceof Integer value) {
                             this.addRenderableWidget(new Button(buttonX, buttonY, buttonWidth, 20, new TextComponent("Simple Button"), (b) -> {}));
                         }
                         else {
@@ -166,22 +219,22 @@ public class SugarSettingsScreen extends Screen {
                 }
 
                 // Json Object
-                // TODO: Check for primitive value slider
                 else if (element.isJsonObject()) {
                     JsonObject jsonObject = element.getAsJsonObject();
                     if (jsonObject.has("isPrimitive")) {
-                        JsonPrimitive dataPrimitive = jsonObject.get("value").getAsJsonPrimitive();
+                        JsonPrimitiveObject primitiveObject = GSON.fromJson(jsonObject, JsonPrimitiveObject.class);
 
-                        // Number
-                        if (dataPrimitive.isNumber()) {
-                            Number number = dataPrimitive.getAsNumber();
-
-                            // Integer Value
-                            if (number instanceof Integer integer) {
-                                int minValue = jsonObject.get("min").getAsInt();
-                                int maxValue = jsonObject.get("max").getAsInt();
-                                this.addRenderableWidget(new ForgeSlider(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: "), TextComponent.EMPTY, minValue, maxValue, integer, true));
-                            }
+                        // Integer
+                        // TODO
+                        if (primitiveObject.getType().equals("int")) {
+                            int min = primitiveObject.getMin().intValue();
+                            int max = primitiveObject.getMax().intValue();
+                            SliderButton slider =new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().intValue(), true, (widget) -> {
+                                int value = widget.getValueInt();
+                                JsonConfig.set(finalModid, key, value, min, max);
+                            });
+                            this.addRenderableWidget(slider);
+                            this.settingsButtons.add(slider);
                         }
                     }
                     else {
@@ -190,11 +243,13 @@ public class SugarSettingsScreen extends Screen {
                 }
 
                 // Json Array
+                // TODO
                 else if (element.isJsonArray()) {
                     this.addRenderableWidget(new Button(buttonX, buttonY, buttonWidth, 20, new TextComponent("Simple Button"), (b) -> {}));
                 }
 
                 // Json Null
+                // TODO
                 else if (element.isJsonNull()) {
                     this.addRenderableWidget(new Button(buttonX, buttonY, buttonWidth, 20, new TextComponent("Simple Button"), (b) -> {}));
                 }

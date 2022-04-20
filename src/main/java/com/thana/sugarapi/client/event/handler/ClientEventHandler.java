@@ -2,7 +2,7 @@ package com.thana.sugarapi.client.event.handler;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.thana.sugarapi.client.config.ClientConfig;
-import com.thana.sugarapi.client.gui.button.SugarSettingsButton;
+import com.thana.sugarapi.client.gui.widget.button.SugarSettingsButton;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
 import com.thana.sugarapi.common.utils.StringEditor;
 import net.minecraft.ChatFormatting;

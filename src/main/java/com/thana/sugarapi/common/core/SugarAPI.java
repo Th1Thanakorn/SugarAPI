@@ -22,7 +22,7 @@ public class SugarAPI {
 
     public static final SimpleLogger LOGGER = new SimpleLogger("SugarAPI");
     public static final String MOD_ID = "sugarapi";
-    public static final String MOD_VERSION = "1.0.0";
+    public static final String MOD_VERSION = "2.0.0";
 
     public SugarAPI() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onPreInit);
@@ -30,7 +30,7 @@ public class SugarAPI {
         MinecraftForge.EVENT_BUS.register(this);
 
         JsonConfig.defaultCreatePath();
-        SugarAPIConfigBuilder.create();
+        SugarAPIClientConfigBuilder.create();
         SugarSettingsScreen.putConfig(SugarAPI.MOD_ID, "SugarAPI");
 
         if (FMLEnvironment.dist == Dist.CLIENT) {

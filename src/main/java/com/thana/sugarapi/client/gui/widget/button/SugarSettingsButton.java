@@ -1,4 +1,4 @@
-package com.thana.sugarapi.client.gui.button;
+package com.thana.sugarapi.client.gui.widget.button;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;

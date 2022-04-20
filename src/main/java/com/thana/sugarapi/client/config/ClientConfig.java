@@ -1,11 +1,11 @@
 package com.thana.sugarapi.client.config;
 
-import com.thana.sugarapi.common.core.SugarAPIConfigBuilder;
+import com.thana.sugarapi.common.core.SugarAPIClientConfigBuilder;
 import com.thana.sugarapi.common.utils.JsonConfig;
 
 public class ClientConfig {
 
-    private static final JsonConfig CONFIG = SugarAPIConfigBuilder.CONFIG;
+    private static final JsonConfig CONFIG = SugarAPIClientConfigBuilder.CONFIG;
 
     public static void read(String modid) {
         JsonConfig.readClient(modid);

@@ -1,6 +1,7 @@
 package com.thana.sugarapi.common.utils;
 
 import com.google.gson.*;
+import com.thana.sugarapi.common.core.SugarAPI;
 
 import java.io.File;
 import java.io.FileReader;
@@ -66,6 +67,47 @@ public class JsonConfig {
     public void put(String name, int i, int min, int max) {
         JsonObject object = new JsonObject();
         object.addProperty("isPrimitive", true);
+        object.addProperty("type", "int");
+        object.addProperty("value", i);
+        object.addProperty("min", min);
+        object.addProperty("max", max);
+        this.config.put(name, object);
+    }
+
+    public void put(String name, double i, double min, double max) {
+        JsonObject object = new JsonObject();
+        object.addProperty("isPrimitive", true);
+        object.addProperty("type", "double");
+        object.addProperty("value", i);
+        object.addProperty("min", min);
+        object.addProperty("max", max);
+        this.config.put(name, object);
+    }
+
+    public void put(String name, float i, float min, float max) {
+        JsonObject object = new JsonObject();
+        object.addProperty("isPrimitive", true);
+        object.addProperty("type", "float");
+        object.addProperty("value", i);
+        object.addProperty("min", min);
+        object.addProperty("max", max);
+        this.config.put(name, object);
+    }
+
+    public void put(String name, short i, short min, short max) {
+        JsonObject object = new JsonObject();
+        object.addProperty("isPrimitive", true);
+        object.addProperty("type", "short");
+        object.addProperty("value", i);
+        object.addProperty("min", min);
+        object.addProperty("max", max);
+        this.config.put(name, object);
+    }
+
+    public void put(String name, long i, long min, long max) {
+        JsonObject object = new JsonObject();
+        object.addProperty("isPrimitive", true);
+        object.addProperty("type", "long");
         object.addProperty("value", i);
         object.addProperty("min", min);
         object.addProperty("max", max);
@@ -121,6 +163,7 @@ public class JsonConfig {
     public static JsonObject modifiableConfig(String modid) {
         JsonObject object = readClient(modid);
         object.remove("version");
+        object.remove("lastConfigId");
         return object;
     }
 
@@ -206,7 +249,19 @@ public class JsonConfig {
 
     public static void set(String modid, String key, int i) {
         JsonObject object = readClient(modid);
-        object.addProperty(key, i);
+        updateConfig(modid, object);
+    }
+
+    public static void set(String modid, String key, int i, int min, int max) {
+        JsonObject object = readClient(modid);
+        JsonObject primitive = new JsonObject();
+        primitive.addProperty("isPrimitive", true);
+        primitive.addProperty("type", "int");
+        primitive.addProperty("value", i);
+        primitive.addProperty("min", min);
+        primitive.addProperty("max", max);
+
+        object.add(key, primitive);
         updateConfig(modid, object);
     }
 
@@ -250,6 +305,10 @@ public class JsonConfig {
         JsonObject object = readClient(modid);
         object.addProperty(key, i);
         updateConfig(modid, object);
+    }
+
+    public static String getLastOpenedId() {
+        return JsonConfig.readClient(SugarAPI.MOD_ID).getAsJsonObject().get("lastConfigId").getAsString();
     }
 
     public String getModid() {
