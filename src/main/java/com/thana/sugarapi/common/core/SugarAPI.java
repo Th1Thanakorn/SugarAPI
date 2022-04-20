@@ -48,7 +48,7 @@ public class SugarAPI {
     private void processIMC(final InterModProcessEvent event) {
         Stream<InterModComms.IMCMessage> messages = event.getIMCStream();
         for (InterModComms.IMCMessage message : messages.toList()) {
-            SugarSettingsScreen.putConfig(message.modId(), (String) message.messageSupplier().get());
+            SugarSettingsScreen.putConfig(message.method(), (String) message.messageSupplier().get());
         }
     }
 
