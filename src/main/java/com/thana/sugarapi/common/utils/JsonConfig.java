@@ -205,7 +205,7 @@ public class JsonConfig {
     }
 
     public double getDouble(String key) {
-        return read().get(key).getAsDouble();
+        return read().get(key) instanceof JsonObject ? read().get(key).getAsJsonObject().get("value").getAsDouble() : read().get(key).getAsDouble();
     }
 
     public float getFloat(String key) {
@@ -257,6 +257,19 @@ public class JsonConfig {
         JsonObject primitive = new JsonObject();
         primitive.addProperty("isPrimitive", true);
         primitive.addProperty("type", "int");
+        primitive.addProperty("value", i);
+        primitive.addProperty("min", min);
+        primitive.addProperty("max", max);
+
+        object.add(key, primitive);
+        updateConfig(modid, object);
+    }
+
+    public static void set(String modid, String key, double i, double min, double max) {
+        JsonObject object = readClient(modid);
+        JsonObject primitive = new JsonObject();
+        primitive.addProperty("isPrimitive", true);
+        primitive.addProperty("type", "double");
         primitive.addProperty("value", i);
         primitive.addProperty("min", min);
         primitive.addProperty("max", max);

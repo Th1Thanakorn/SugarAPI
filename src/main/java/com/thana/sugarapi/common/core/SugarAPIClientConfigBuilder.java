@@ -12,6 +12,7 @@ public class SugarAPIClientConfigBuilder {
         CONFIG.put("nbtLength", 32767, 0, 32767);
         CONFIG.put("blindnessSprint", false);
         CONFIG.put("renderBlindness", true);
+        CONFIG.put("flyingSpeed", 1.0D, 1.0D, 4.0D);
 
         CONFIG.createConfigClient();
     }

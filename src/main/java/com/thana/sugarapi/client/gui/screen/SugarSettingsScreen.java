@@ -229,8 +229,23 @@ public class SugarSettingsScreen extends Screen {
                         if (primitiveObject.getType().equals("int")) {
                             int min = primitiveObject.getMin().intValue();
                             int max = primitiveObject.getMax().intValue();
-                            SliderButton slider =new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().intValue(), true, (widget) -> {
+                            SliderButton slider = new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().intValue(), true, (widget) -> {
                                 int value = widget.getValueInt();
+                                JsonConfig.set(finalModid, key, value, min, max);
+                            });
+                            this.addRenderableWidget(slider);
+                            this.settingsButtons.add(slider);
+                        }
+
+                        // Double
+                        if (primitiveObject.getType().equals("double")) {
+                            double min = primitiveObject.getMin().doubleValue();
+                            double max = primitiveObject.getMax().doubleValue();
+                            SliderButton slider = new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().doubleValue(), 0.1D, 0, true, (widget) -> {
+                                double value = widget.getValue();
+                                if (this.mc.player != null) {
+                                    this.mc.player.getAbilities().setFlyingSpeed(0.05F * (float) value);
+                                }
                                 JsonConfig.set(finalModid, key, value, min, max);
                             });
                             this.addRenderableWidget(slider);
