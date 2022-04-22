@@ -163,15 +163,15 @@ public class SugarSettingsScreen extends Screen {
             this.errorMessage = null;
             this.shownModId = modid;
             JsonObject object = JsonConfig.modifiableConfig(this.shownModId);
-            int meanLength = 0;
+            int textLength = 0;
             for (String key : object.keySet()) {
-                meanLength = Math.max(meanLength, this.font.width(key));
+                textLength = Math.max(textLength, this.font.width(key));
             }
-            meanLength += 8;
+            textLength += 8;
             int i = 0;
             for (String key : object.keySet()) {
                 JsonElement element = object.get(key);
-                int buttonX = this.editorX + 6 + meanLength;
+                int buttonX = this.editorX + 6 + textLength;
                 int buttonY = this.editorY + 6 + i * 24;
                 int buttonWidth = this.width * 5 / 6 - 4 - buttonX;
                 String finalModid = modid;
