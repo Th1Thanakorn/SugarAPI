@@ -4,20 +4,24 @@ import com.thana.sugarapi.client.config.ClientConfig;
 import com.thana.sugarapi.client.event.ConfigCreationEvent;
 import com.thana.sugarapi.client.event.ConfigNameCreationEvent;
 import com.thana.sugarapi.client.event.RightClickConfigButtonEvent;
+import com.thana.sugarapi.client.event.SpecialJobEvent;
 import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.StringEditor;
 import com.thana.sugarapi.common.utils.TextWrapper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Arrays;
 
-public class ConfigEventHandler {
+public class ConfigClientEventHandler {
 
     public static final ChatFormatting[] onlyColor = Arrays.stream(ChatFormatting.values()).filter((color) -> color != ChatFormatting.ITALIC && color != ChatFormatting.BOLD && color != ChatFormatting.RESET && color != ChatFormatting.UNDERLINE && color != ChatFormatting.OBFUSCATED && color != ChatFormatting.STRIKETHROUGH).toList().toArray(ChatFormatting[]::new);
+
+    private final Minecraft mc = Minecraft.getInstance();
 
     @SubscribeEvent
     public void onConfigCreation(ConfigCreationEvent event) {
@@ -68,6 +72,20 @@ public class ConfigEventHandler {
                     widget.setMessage(TextWrapper.wrapped(this.formatName(previous.getName()), previous));
                     JsonConfig.set(SugarAPI.MOD_ID, key, previous.getName());
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void addCustomJob(SpecialJobEvent event) {
+        String key = event.getKey();
+        if (event.sameMod(SugarAPI.MOD_ID)) {
+            if (key.equals("flyingSpeed")) {
+                event.setJob(() -> {
+                    if (this.mc.player != null) {
+                        this.mc.player.getAbilities().setFlyingSpeed(0.05F * (float) ClientConfig.getDouble(key));
+                    }
+                });
             }
         }
     }

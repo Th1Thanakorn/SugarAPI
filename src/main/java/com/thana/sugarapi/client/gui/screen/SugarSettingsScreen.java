@@ -7,6 +7,7 @@ import com.thana.sugarapi.client.config.ClientConfig;
 import com.thana.sugarapi.client.event.ConfigCreationEvent;
 import com.thana.sugarapi.client.event.ConfigNameCreationEvent;
 import com.thana.sugarapi.client.event.RightClickConfigButtonEvent;
+import com.thana.sugarapi.client.event.SpecialJobEvent;
 import com.thana.sugarapi.client.gui.widget.button.ScrollingTabButton;
 import com.thana.sugarapi.client.gui.widget.button.SliderButton;
 import com.thana.sugarapi.common.core.SugarAPI;
@@ -247,10 +248,15 @@ public class SugarSettingsScreen extends Screen {
                 int buttonY = this.editorY + 6 + i * 24;
                 int buttonWidth = this.width * 5 / 6 - 10 - buttonX;
                 String finalModid = modid;
-                ConfigCreationEvent event = new ConfigCreationEvent(modid, key, element, buttonX, buttonY, buttonWidth, 20);
-                MinecraftForge.EVENT_BUS.post(event);
-                if (event.isCanceled()) {
-                    AbstractWidget setting = event.getSetting();
+
+                // Event Creation
+                ConfigCreationEvent creationEvent = new ConfigCreationEvent(modid, key, element, buttonX, buttonY, buttonWidth, 20);
+                SpecialJobEvent jobEvent = new SpecialJobEvent(modid, key);
+                MinecraftForge.EVENT_BUS.post(creationEvent);
+                MinecraftForge.EVENT_BUS.post(jobEvent);
+                Runnable customJob = jobEvent.getJob();
+                if (creationEvent.isCanceled()) {
+                    AbstractWidget setting = creationEvent.getSetting();
                     if (setting != null) {
                         this.addRenderableWidget(setting);
                         this.settingsButtons.add(setting);
@@ -270,6 +276,7 @@ public class SugarSettingsScreen extends Screen {
                             boolean value = JsonConfig.modifiableConfig(finalModid).get(key).getAsBoolean();
                             JsonConfig.set(finalModid, key, !value);
                             b.setMessage(new TextComponent(!value ? ChatFormatting.GREEN + "YES" : ChatFormatting.RED + "NO"));
+                            customJob.run();
                         });
                         this.addRenderableWidget(button);
                         this.settingsButtons.add(button);
@@ -283,7 +290,10 @@ public class SugarSettingsScreen extends Screen {
                         box.setCanLoseFocus(true);
                         box.setMaxLength(32767);
                         box.setValue(JsonConfig.modifiableConfig(modid).get(key).getAsString());
-                        box.setResponder((text) -> JsonConfig.set(finalModid, key, text));
+                        box.setResponder((text) -> {
+                            JsonConfig.set(finalModid, key, text);
+                            customJob.run();
+                        });
                         this.addRenderableWidget(box);
                         this.settingsButtons.add(box);
                         this.keySettingsMap.put(key, box);
@@ -318,6 +328,7 @@ public class SugarSettingsScreen extends Screen {
                             SliderButton slider = new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().intValue(), true, (widget) -> {
                                 int value = widget.getValueInt();
                                 JsonConfig.set(finalModid, key, value, min, max);
+                                customJob.run();
                             });
                             this.addRenderableWidget(slider);
                             this.settingsButtons.add(slider);
@@ -330,10 +341,8 @@ public class SugarSettingsScreen extends Screen {
                             double max = primitiveObject.getMax().doubleValue();
                             SliderButton slider = new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().doubleValue(), 0.1D, 0, true, (widget) -> {
                                 double value = widget.getValue();
-                                if (this.mc.player != null) {
-                                    this.mc.player.getAbilities().setFlyingSpeed(0.05F * (float) value);
-                                }
                                 JsonConfig.set(finalModid, key, value, min, max);
+                                customJob.run();
                             });
                             this.addRenderableWidget(slider);
                             this.settingsButtons.add(slider);

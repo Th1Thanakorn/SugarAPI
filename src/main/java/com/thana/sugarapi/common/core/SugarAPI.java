@@ -1,7 +1,7 @@
 package com.thana.sugarapi.common.core;
 
 import com.thana.sugarapi.client.event.handler.ClientEventHandler;
-import com.thana.sugarapi.client.event.handler.ConfigEventHandler;
+import com.thana.sugarapi.client.event.handler.ConfigClientEventHandler;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.SimpleLogger;
@@ -62,6 +62,6 @@ public class SugarAPI {
 
     private void clientEvent() {
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
-        MinecraftForge.EVENT_BUS.register(new ConfigEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ConfigClientEventHandler());
     }
 }
