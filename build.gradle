@@ -19,7 +19,7 @@ plugins {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 
-version = '2.0.0'
+version = '2.1.0'
 group = 'com.thana.sugarapi' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'sugarapi'
 

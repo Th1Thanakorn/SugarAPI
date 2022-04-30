@@ -13,6 +13,7 @@ public class SugarAPIClientConfigBuilder {
         CONFIG.put("blindnessSprint", false);
         CONFIG.put("renderBlindness", true);
         CONFIG.put("flyingSpeed", 1.0D, 1.0D, 4.0D);
+//        CONFIG.putAdjustable("editorColor", new RGBConfig(0, 0, 0, 170));
 
         CONFIG.createConfigClient();
     }

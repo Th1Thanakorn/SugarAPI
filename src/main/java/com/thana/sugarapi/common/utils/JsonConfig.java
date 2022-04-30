@@ -2,6 +2,7 @@ package com.thana.sugarapi.common.utils;
 
 import com.google.gson.*;
 import com.thana.sugarapi.common.core.SugarAPI;
+import com.thana.sugarapi.common.utils.config.AdjustableVariable;
 
 import java.io.File;
 import java.io.FileReader;
@@ -123,6 +124,12 @@ public class JsonConfig {
         this.config.put("lang", object);
     }
 
+    public void putAdjustable(String key, AdjustableVariable<? extends Number> variable) {
+        JsonObject object = variable.toJson();
+        object.addProperty("isAdjustable", true);
+        this.config.put(key, object);
+    }
+
     public void createConfigClient() {
         File file = new File(DIR_CLIENT + String.format("%s.json", this.modid));
         JsonObject oldConfig = JsonConfig.readClient(this.modid);
@@ -140,6 +147,7 @@ public class JsonConfig {
     public static JsonObject readClient(String modid) {
         JsonObject object = new JsonObject();
         File dir = new File(DIR_CLIENT);
+        dir.mkdirs();
         if (dir.listFiles() != null) {
             for (File file : dir.listFiles()) {
                 if (file.getName().startsWith(modid)) {

@@ -22,7 +22,7 @@ public class SugarAPI {
 
     public static final SimpleLogger LOGGER = new SimpleLogger("SugarAPI");
     public static final String MOD_ID = "sugarapi";
-    public static final String MOD_VERSION = "2.0.0";
+    public static final String MOD_VERSION = "2.1.0";
 
     public SugarAPI() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onPreInit);

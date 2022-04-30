@@ -1,8 +1,11 @@
 package com.thana.sugarapi.client.gui.screen;
 
 import com.google.gson.*;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.thana.sugarapi.client.config.ClientConfig;
+import com.thana.sugarapi.client.event.ConfigCreationEvent;
+import com.thana.sugarapi.client.gui.widget.button.ScrollingTabButton;
 import com.thana.sugarapi.client.gui.widget.button.SliderButton;
 import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.JsonConfig;
@@ -10,6 +13,7 @@ import com.thana.sugarapi.common.utils.JsonPrimitiveObject;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
@@ -18,6 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.StringUtil;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,6 +42,9 @@ public class SugarSettingsScreen extends Screen {
     private int editorY;
     private int editorRight;
     private int editorBottom;
+    private int editorWidth;
+    private int editorHeight;
+    private double scrollDelta;
     private String shownModId = "";
     private String errorMessage = null;
 
@@ -51,6 +59,8 @@ public class SugarSettingsScreen extends Screen {
         this.editorY = this.height / 7 - 4;
         this.editorRight = this.width * 5 / 6 + 4;
         this.editorBottom = this.height * 6 / 7 + 4;
+        this.editorWidth = this.editorRight - this.editorX;
+        this.editorHeight = this.editorBottom - this.editorY;
         this.shownModId = "";
         this.errorMessage = null;
         this.modSelectionButtons.clear();
@@ -60,6 +70,11 @@ public class SugarSettingsScreen extends Screen {
             JsonConfig.set(SugarAPI.MOD_ID, "lastConfigId", "");
             this.clearWidgets();
             this.init();
+        }));
+        this.addRenderableWidget(new ScrollingTabButton(this.width / 6 + this.buttonSize + 12, this.height / 7 - 4, 4, this.height * 5 / 7 + 8, (slide) -> {
+
+        }));
+        this.addRenderableWidget(new ScrollingTabButton(this.width * 5 / 6, this.height / 7 - 4, 4, this.height * 5 / 7 + 8, (slide) -> {
         }));
 
         int i = 0;
@@ -86,29 +101,49 @@ public class SugarSettingsScreen extends Screen {
         this.fillGradient(poseStack, this.width / 6 - 4, this.height / 7 - 4, this.width * 5 / 6 + 4, this.height * 6 / 7 + 4, -1072689136, -804253680);
         this.fillGradient(poseStack, this.width / 6 + this.buttonSize + 16, this.height / 7 - 4, this.width * 5 / 6 + 4, this.height * 6 / 7 + 4, colorA, colorB);
         Gui.drawString(poseStack, this.font, ChatFormatting.UNDERLINE + "Mods", this.width / 6 + 4, this.height / 7 + 3, 16777215);
+
+        // Scrolling Scissors
+        poseStack.pushPose();
+        poseStack.translate(0.0D, this.scrollDelta, 0.0D);
+        if (!this.settingsButtons.isEmpty()) {
+            double scale = this.mc.getWindow().getGuiScale();
+            int startX = this.width / 6 - 30;
+            int startY = this.height / 7;
+            int width = this.width * 5 / 6;
+            int height = this.height * 5 / 7 + 4;
+            poseStack.pushPose();
+            RenderSystem.enableScissor((int) (startX * scale), (int) (startY * scale), (int) (width * scale), (int) (height * scale));
+            poseStack.popPose();
+        }
+        if (!this.shownModId.isEmpty()) {
+            JsonObject object = JsonConfig.modifiableConfig(this.shownModId);
+            int i = 0;
+            for (String key : object.keySet()) {
+                this.font.drawShadow(poseStack, ChatFormatting.AQUA + key, (float) (this.editorX + 6), (float) (this.editorY + 12 + i * 24 + this.scrollDelta), 16777215);
+                i++;
+            }
+        }
         super.render(poseStack, mouseX, mouseY, partialTicks);
+        RenderSystem.disableScissor();
+        poseStack.popPose();
+
         for (Button button : this.modSelectionButtons) {
             if (button.isHoveredOrFocused() && !button.isFocused()) {
                 this.renderComponentTooltip(poseStack, this.getTooltip(button.getMessage().getString()), mouseX, mouseY, this.font);
             }
         }
-
-        // Show Headers
-        if (!this.shownModId.isEmpty()) {
-            JsonObject object = JsonConfig.modifiableConfig(this.shownModId);
-            int i = 0;
-            for (String key : object.keySet()) {
-                this.font.drawShadow(poseStack, ChatFormatting.AQUA + key, this.editorX + 6, this.editorY + 12 + i * 24, 16777215);
-                i++;
-            }
-        }
-
         // Show Errors
         if (!StringUtil.isNullOrEmpty(this.errorMessage)) {
             int middleX = (this.editorRight + this.editorX) / 2;
             int middleY = (this.editorBottom + this.editorY) / 2;
             Gui.drawCenteredString(poseStack, this.font, this.errorMessage, middleX, middleY - this.font.lineHeight / 2, 16777215);
         }
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        this.scrollDelta -= delta * 2.5D;
+        return super.mouseScrolled(mouseX, mouseY, delta);
     }
 
     public static void putConfig(String modid, String prettyName) {
@@ -173,8 +208,17 @@ public class SugarSettingsScreen extends Screen {
                 JsonElement element = object.get(key);
                 int buttonX = this.editorX + 6 + textLength;
                 int buttonY = this.editorY + 6 + i * 24;
-                int buttonWidth = this.width * 5 / 6 - 4 - buttonX;
+                int buttonWidth = this.width * 5 / 6 - 10 - buttonX;
                 String finalModid = modid;
+                ConfigCreationEvent event = new ConfigCreationEvent(key, element, buttonX, buttonY);
+                MinecraftForge.EVENT_BUS.post(event);
+                if (event.isCanceled()) {
+                    AbstractWidget setting = event.getSetting();
+                    if (setting != null) {
+                        this.addRenderableWidget(setting);
+                        continue;
+                    }
+                }
 
                 // Primitive Value
                 if (element.isJsonPrimitive()) {
