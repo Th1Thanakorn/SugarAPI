@@ -232,6 +232,10 @@ public class JsonConfig {
         return read().get(key).getAsString().charAt(0);
     }
 
+    public String getString(String key) {
+        return read().get(key).getAsString();
+    }
+
     public JsonObject getJsonObject(String key) {
         return read().get(key).getAsJsonObject();
     }

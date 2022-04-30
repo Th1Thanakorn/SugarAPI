@@ -1,6 +1,7 @@
 package com.thana.sugarapi.common.core;
 
 import com.thana.sugarapi.client.event.handler.ClientEventHandler;
+import com.thana.sugarapi.client.event.handler.ConfigEventHandler;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.SimpleLogger;
@@ -22,7 +23,7 @@ public class SugarAPI {
 
     public static final SimpleLogger LOGGER = new SimpleLogger("SugarAPI");
     public static final String MOD_ID = "sugarapi";
-    public static final String MOD_VERSION = "2.1.0";
+    public static final String MOD_VERSION = "2.2.0";
 
     public SugarAPI() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onPreInit);
@@ -61,5 +62,6 @@ public class SugarAPI {
 
     private void clientEvent() {
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
+        MinecraftForge.EVENT_BUS.register(new ConfigEventHandler());
     }
 }

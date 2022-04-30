@@ -14,7 +14,8 @@ public class SugarAPIClientConfigBuilder {
         CONFIG.put("renderBlindness", true);
         CONFIG.put("flyingSpeed", 1.0D, 1.0D, 4.0D);
         CONFIG.put("hideScoreboard", false);
-        CONFIG.put("formatDebugOverlay", false);
+        CONFIG.put("formatDebugOverlay", true);
+        CONFIG.put("headerColor", "aqua");
 
         CONFIG.createConfigClient();
     }

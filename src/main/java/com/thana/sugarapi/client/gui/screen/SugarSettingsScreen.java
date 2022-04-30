@@ -5,6 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.thana.sugarapi.client.config.ClientConfig;
 import com.thana.sugarapi.client.event.ConfigCreationEvent;
+import com.thana.sugarapi.client.event.ConfigNameCreationEvent;
+import com.thana.sugarapi.client.event.RightClickConfigButtonEvent;
 import com.thana.sugarapi.client.gui.widget.button.ScrollingTabButton;
 import com.thana.sugarapi.client.gui.widget.button.SliderButton;
 import com.thana.sugarapi.common.core.SugarAPI;
@@ -17,12 +19,15 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.StringUtil;
 import net.minecraftforge.common.MinecraftForge;
+import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +41,7 @@ public class SugarSettingsScreen extends Screen {
     private final Minecraft mc = Minecraft.getInstance();
     private final List<Button> modSelectionButtons = new ArrayList<>();
     private final List<Widget> settingsButtons = new ArrayList<>();
+    private final HashMap<String, AbstractWidget> keySettingsMap = new HashMap<>();
 
     private int buttonSize;
     private int editorX;
@@ -44,6 +50,7 @@ public class SugarSettingsScreen extends Screen {
     private int editorBottom;
     private int editorWidth;
     private int editorHeight;
+    private int buttonTookSize;
     private double scrollDelta;
     private String shownModId = "";
     private String errorMessage = null;
@@ -63,8 +70,11 @@ public class SugarSettingsScreen extends Screen {
         this.editorHeight = this.editorBottom - this.editorY;
         this.shownModId = "";
         this.errorMessage = null;
+        this.buttonTookSize = 0;
+        this.scrollDelta = 0.0D;
         this.modSelectionButtons.clear();
         this.settingsButtons.clear();
+        this.keySettingsMap.clear();
 
         this.addRenderableWidget(new Button(this.width / 6 - 30, this.height / 7, 20, 20, new TextComponent("\u27F3"), (button) -> {
             JsonConfig.set(SugarAPI.MOD_ID, "lastConfigId", "");
@@ -94,7 +104,8 @@ public class SugarSettingsScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        System.out.println(this.scrollDelta);
         this.renderBackground(poseStack);
         int colorA = FastColor.ARGB32.color(170, 0, 0, 0);
         int colorB = FastColor.ARGB32.color(170, 0, 0, 0);
@@ -119,7 +130,10 @@ public class SugarSettingsScreen extends Screen {
             JsonObject object = JsonConfig.modifiableConfig(this.shownModId);
             int i = 0;
             for (String key : object.keySet()) {
-                this.font.drawShadow(poseStack, ChatFormatting.AQUA + key, (float) (this.editorX + 6), (float) (this.editorY + 12 + i * 24 + this.scrollDelta), 16777215);
+                ConfigNameCreationEvent event = new ConfigNameCreationEvent(this.shownModId, key);
+                MinecraftForge.EVENT_BUS.post(event);
+                String obfKey = event.isCanceled() ? event.getReturn() : key;
+                this.font.drawShadow(poseStack, this.getHeaderFormatting() + obfKey, (float) (this.editorX + 6), (float) (this.editorY + 12 + i * 24 + this.scrollDelta), 16777215);
                 i++;
             }
         }
@@ -142,8 +156,27 @@ public class SugarSettingsScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        this.scrollDelta -= delta * 2.5D;
+        if (this.buttonTookSize + this.scrollDelta > this.editorHeight) {
+            this.scrollDelta -= 1.0D + (int) delta;
+        }
         return super.mouseScrolled(mouseX, mouseY, delta);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        for (GuiEventListener listener : this.children()) {
+            if (listener instanceof AbstractWidget widget && listener.isMouseOver(mouseX, mouseY) && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.keySettingsMap.containsValue(widget)) {
+                this.setFocused(listener);
+                for (String key : this.keySettingsMap.keySet()) {
+                    AbstractWidget value = this.keySettingsMap.get(key);
+                    if (value.equals(widget)) {
+                        MinecraftForge.EVENT_BUS.post(new RightClickConfigButtonEvent(this.shownModId, key, widget));
+                        break;
+                    }
+                }
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     public static void putConfig(String modid, String prettyName) {
@@ -162,7 +195,7 @@ public class SugarSettingsScreen extends Screen {
                         new TextComponent(ChatFormatting.WHITE + "Mod Version: " + ChatFormatting.GOLD + modVersion));
             }
         }
-        return List.of();
+        return List.of(new TextComponent(ChatFormatting.RED + "Could not find modid related to!"));
     }
 
     private void showConfig(Button button) {
@@ -200,22 +233,29 @@ public class SugarSettingsScreen extends Screen {
             JsonObject object = JsonConfig.modifiableConfig(this.shownModId);
             int textLength = 0;
             for (String key : object.keySet()) {
-                textLength = Math.max(textLength, this.font.width(key));
+                ConfigNameCreationEvent event = new ConfigNameCreationEvent(modid, key);
+                MinecraftForge.EVENT_BUS.post(event);
+                String obfKey = event.isCanceled() ? event.getReturn() : key;
+                textLength = Math.max(textLength, this.font.width(obfKey));
             }
             textLength += 8;
             int i = 0;
+            this.buttonTookSize = this.editorY + 6 + object.size() * 24;
             for (String key : object.keySet()) {
                 JsonElement element = object.get(key);
                 int buttonX = this.editorX + 6 + textLength;
                 int buttonY = this.editorY + 6 + i * 24;
                 int buttonWidth = this.width * 5 / 6 - 10 - buttonX;
                 String finalModid = modid;
-                ConfigCreationEvent event = new ConfigCreationEvent(key, element, buttonX, buttonY);
+                ConfigCreationEvent event = new ConfigCreationEvent(modid, key, element, buttonX, buttonY, buttonWidth, 20);
                 MinecraftForge.EVENT_BUS.post(event);
                 if (event.isCanceled()) {
                     AbstractWidget setting = event.getSetting();
                     if (setting != null) {
                         this.addRenderableWidget(setting);
+                        this.settingsButtons.add(setting);
+                        this.keySettingsMap.put(key, setting);
+                        i++;
                         continue;
                     }
                 }
@@ -233,6 +273,7 @@ public class SugarSettingsScreen extends Screen {
                         });
                         this.addRenderableWidget(button);
                         this.settingsButtons.add(button);
+                        this.keySettingsMap.put(key, button);
                     }
 
                     // String
@@ -245,6 +286,7 @@ public class SugarSettingsScreen extends Screen {
                         box.setResponder((text) -> JsonConfig.set(finalModid, key, text));
                         this.addRenderableWidget(box);
                         this.settingsButtons.add(box);
+                        this.keySettingsMap.put(key, box);
                     }
 
                     // Number
@@ -279,6 +321,7 @@ public class SugarSettingsScreen extends Screen {
                             });
                             this.addRenderableWidget(slider);
                             this.settingsButtons.add(slider);
+                            this.keySettingsMap.put(key, slider);
                         }
 
                         // Double
@@ -294,6 +337,7 @@ public class SugarSettingsScreen extends Screen {
                             });
                             this.addRenderableWidget(slider);
                             this.settingsButtons.add(slider);
+                            this.keySettingsMap.put(key, slider);
                         }
                     }
                     else {
@@ -319,5 +363,11 @@ public class SugarSettingsScreen extends Screen {
             this.errorMessage = ChatFormatting.RED + "Can't create config for mod: " + modName;
             this.shownModId = "";
         }
+    }
+
+    private ChatFormatting getHeaderFormatting() {
+        String colorString = ClientConfig.getString("headerColor");
+        ChatFormatting formatting = ChatFormatting.getByName(colorString);
+        return formatting != null ? formatting : ChatFormatting.AQUA;
     }
 }

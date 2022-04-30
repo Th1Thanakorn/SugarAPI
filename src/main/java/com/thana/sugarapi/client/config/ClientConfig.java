@@ -26,4 +26,8 @@ public class ClientConfig {
     public static double getDouble(String key) {
         return CONFIG.getDouble(key);
     }
+
+    public static String getString(String key) {
+        return CONFIG.getString(key);
+    }
 }
