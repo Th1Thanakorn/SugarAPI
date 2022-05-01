@@ -12,8 +12,13 @@ public class ScrollingTabButton extends Button {
 
     private static final ResourceLocation TEXTURES = new ResourceLocation("sugarapi:textures/gui/scrolling_tab.png");
 
+    public int drawWidth;
+    public int drawHeight;
+
     public ScrollingTabButton(int x, int y, int drawWidth, int drawHeight, OnPress onSlide) {
         super(x, y, drawWidth, drawHeight, TextComponent.EMPTY, onSlide);
+        this.drawWidth = drawWidth;
+        this.drawHeight = drawHeight;
     }
 
     @Override
@@ -23,6 +28,6 @@ public class ScrollingTabButton extends Button {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        Gui.blit(poseStack, this.x, this.y, this.getBlitOffset(), this.width, this.height, this.width, this.height, 4, 16);
+        Gui.blit(poseStack, this.x, this.y, this.getBlitOffset(), this.drawWidth, this.drawHeight, this.drawWidth, this.drawHeight, 4, 16);
     }
 }

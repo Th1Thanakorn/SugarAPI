@@ -9,6 +9,7 @@ import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.StringEditor;
 import com.thana.sugarapi.common.utils.TextWrapper;
+import com.thana.sugarapi.common.utils.config.ChatFormattingSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -32,16 +33,9 @@ public class ConfigClientEventHandler {
         int height = event.getHeight();
         if (event.sameMod(SugarAPI.MOD_ID)) {
             if (event.is("headerColor")) {
-                ChatFormatting formatting = ChatFormatting.getByName(event.getValue().getAsString());
-                if (formatting != null) {
-                    event.setSettingWidget(new Button(x, y, width, height, TextWrapper.wrapped(this.formatName(formatting.getName()), formatting), (button) -> {
-                        ChatFormatting f = ChatFormatting.getByName(ClientConfig.getString(key));
-                        if (f != null) {
-                            ChatFormatting next = onlyColor[(f.ordinal() + 1) % onlyColor.length];
-                            button.setMessage(TextWrapper.wrapped(this.formatName(next.getName()), next));
-                            JsonConfig.set(event.getModid(), key, next.getName());
-                        }
-                    }));
+                Button button = ChatFormattingSettings.create(x, y, width, height, key, ClientConfig.getString(key), event.getModid());
+                if (button != null) {
+                    event.setSettingWidget(button);
                     event.setCanceled(true);
                 }
             }
@@ -71,6 +65,7 @@ public class ConfigClientEventHandler {
                     ChatFormatting previous = onlyColor[(onlyColor.length + (formatting.ordinal() - 1)) % onlyColor.length];
                     widget.setMessage(TextWrapper.wrapped(this.formatName(previous.getName()), previous));
                     JsonConfig.set(SugarAPI.MOD_ID, key, previous.getName());
+                    event.playDownSound();
                 }
             }
         }
