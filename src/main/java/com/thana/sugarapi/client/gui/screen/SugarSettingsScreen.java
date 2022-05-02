@@ -6,10 +6,7 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.thana.sugarapi.client.config.ClientConfig;
-import com.thana.sugarapi.client.event.ConfigCreationEvent;
-import com.thana.sugarapi.client.event.ConfigNameCreationEvent;
-import com.thana.sugarapi.client.event.RightClickConfigButtonEvent;
-import com.thana.sugarapi.client.event.SpecialJobEvent;
+import com.thana.sugarapi.client.event.*;
 import com.thana.sugarapi.client.gui.widget.button.ScrollingTabButton;
 import com.thana.sugarapi.client.gui.widget.button.SliderButton;
 import com.thana.sugarapi.common.core.SugarAPI;
@@ -127,7 +124,11 @@ public class SugarSettingsScreen extends Screen {
         List<Widget> complementWidgets = this.renderables.stream().filter((obj) -> obj instanceof AbstractWidget && !this.settingsButtons.contains(obj)).toList();
         complementWidgets.forEach((w) -> w.render(poseStack, mouseX, mouseY, partialTicks));
 
-        // TODO: Update Sliding Pane
+        // Sliding Pane
+        if (this.sliderSettings != null) {
+            this.sliderSettings.drawHeight = (this.height * 5 / 7 + 8) * (this.buttonTookSize < this.editorHeight ? 1 : 1 - this.editorHeight / this.buttonTookSize);
+            this.sliderSettings.y = (int) (this.height / 7 - 4 - this.scrollDelta);
+        }
 
         // Render Settings
         poseStack.pushPose();
@@ -163,6 +164,16 @@ public class SugarSettingsScreen extends Screen {
         for (Button button : this.modSelectionButtons) {
             if (button.isHoveredOrFocused() && !button.isFocused()) {
                 this.renderComponentTooltip(poseStack, this.getTooltip(button.getMessage().getString()), mouseX, mouseY, this.font);
+            }
+        }
+        for (String key : this.keySettingsMap.keySet()) {
+            AbstractWidget widget = this.keySettingsMap.get(key);
+            if (widget.isHoveredOrFocused() && !widget.isFocused()) {
+                ConfigTooltipEvent event = new ConfigTooltipEvent(this.shownModId, key);
+                MinecraftForge.EVENT_BUS.post(event);
+                if (event.isCanceled()) {
+                    this.renderComponentTooltip(poseStack, event.getTooltip(), mouseX, mouseY, this.font);
+                }
             }
         }
         if (this.refreshButton.isHoveredOrFocused() && !this.refreshButton.isFocused()) {
