@@ -2,8 +2,8 @@ package com.thana.sugarapi.client.event.handler;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.thana.sugarapi.client.config.ClientConfig;
-import com.thana.sugarapi.client.gui.widget.button.SugarSettingsButton;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
+import com.thana.sugarapi.client.gui.widget.button.SugarSettingsButton;
 import com.thana.sugarapi.common.utils.StringEditor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -28,7 +28,7 @@ public class ClientEventHandler {
             if (InputConstants.isKeyDown(this.mc.getWindow().getWindow(), GLFW.GLFW_KEY_LEFT_SHIFT)) {
                 int i = ClientConfig.getInt("nbtLength");
                 event.getToolTip().remove(event.getToolTip().size() - 1);
-                event.getToolTip().add(StringEditor.cut(this.visitor.visit(itemStack.getTag()), i));
+                event.getToolTip().add(StringEditor.cut(this.visitor.visit(itemStack.getTag()), i, ChatFormatting.WHITE + "}"));
             }
             else {
                 event.getToolTip().add(new TextComponent(ChatFormatting.DARK_GRAY + "Press " + ChatFormatting.GOLD + ChatFormatting.ITALIC + "LShift " + ChatFormatting.DARK_GRAY + "to view nbt"));
