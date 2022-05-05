@@ -7,8 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * This API will mark your code points as "DevelopmentOnly"
  * Which means this API only work in development environment {@link net.minecraftforge.fml.loading.FMLEnvironment}
- *
- * @author Thana
+ * You need to manually create attached API for it {@link DevelopmentChecker} by calling DevelopmentChecker.check()
+ * @author Thana, HTMLChannel
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

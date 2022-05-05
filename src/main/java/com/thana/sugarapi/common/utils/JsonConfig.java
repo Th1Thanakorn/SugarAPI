@@ -1,8 +1,8 @@
 package com.thana.sugarapi.common.utils;
 
 import com.google.gson.*;
+import com.thana.sugarapi.common.api.annotations.DevelopmentChecker;
 import com.thana.sugarapi.common.api.annotations.ModDevelopment;
-import com.thana.sugarapi.common.api.annotations.SafeParse;
 import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.config.AdjustableVariable;
 
@@ -148,9 +148,9 @@ public class JsonConfig {
         }
     }
 
-    @SafeParse
     @ModDevelopment
     public void createKeyLoggerClient() {
+        if (DevelopmentChecker.found()) return;
         File file = new File(DIR_KEY_CLIENT + String.format("%s.properties", this.modid));
         List<String> keys = this.config.keySet().stream().toList();
         try {

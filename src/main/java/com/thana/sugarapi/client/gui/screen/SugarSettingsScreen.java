@@ -125,8 +125,9 @@ public class SugarSettingsScreen extends Screen {
 
         // Sliding Pane
         if (this.sliderSettings != null) {
-            this.sliderSettings.drawHeight = (this.height * 5 / 7 + 8) * (this.buttonTookSize < this.editorHeight ? 1 : 1 - this.editorHeight / this.buttonTookSize);
-            this.sliderSettings.y = (int) (this.height / 7 - 4 - this.scrollDelta);
+            int showHeight = this.height * 5 / 7 + 8;
+            this.sliderSettings.drawHeight = (float) showHeight / (float) this.buttonTookSize * (float) showHeight;
+            this.sliderSettings.y = (int) (this.height / 7 - 4 + this.scrollDelta);
         }
 
         // Render Settings

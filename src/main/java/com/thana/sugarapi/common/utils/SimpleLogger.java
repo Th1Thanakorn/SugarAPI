@@ -45,11 +45,11 @@ public class SimpleLogger {
     }
 
     public void error(String text) {
-        this.logger.info(ERROR, text);
+        this.logger.error(ERROR, text);
     }
 
     public void error(String text, Object... params) {
-        this.logger.info(ERROR, text, params);
+        this.logger.error(ERROR, text, params);
     }
 
     @Override
