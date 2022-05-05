@@ -6,14 +6,13 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.thana.sugarapi.client.config.ClientConfig;
+import com.thana.sugarapi.client.config.handler.MouseScroll;
 import com.thana.sugarapi.client.event.*;
 import com.thana.sugarapi.client.gui.widget.button.ScrollingTabButton;
 import com.thana.sugarapi.client.gui.widget.button.SliderButton;
 import com.thana.sugarapi.common.core.SugarAPI;
-import com.thana.sugarapi.common.utils.ARGBHelper;
-import com.thana.sugarapi.common.utils.JsonConfig;
-import com.thana.sugarapi.common.utils.JsonPrimitiveObject;
-import com.thana.sugarapi.common.utils.TextWrapper;
+import com.thana.sugarapi.common.utils.*;
+import com.thana.sugarapi.common.utils.config.EnumSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -184,14 +183,18 @@ public class SugarSettingsScreen extends Screen {
         if (!StringUtil.isNullOrEmpty(this.errorMessage)) {
             int middleX = (this.editorRight + this.editorX) / 2;
             int middleY = (this.editorBottom + this.editorY) / 2;
-            Gui.drawCenteredString(poseStack, this.font, this.errorMessage, middleX, middleY - this.font.lineHeight / 2, 16777215);
+            Gui.drawCenteredString(poseStack, this.font, this.errorMessage, middleX, middleY - this.font.lineHeight / 2, FontColor.WHITE);
         }
 
         // Render Toast
         if (!this.toastText.isEmpty()) {
             long now = System.currentTimeMillis();
             int timeElapsed = (int) (now - this.lastToastShown);
-            int timeRemaining = (int) (10000L - timeElapsed);
+            int timeRemaining = Mth.clamp(6000 - timeElapsed, 0, 6000);
+            if (timeElapsed > 6000) {
+                this.toastText = "";
+                this.lastToastShown = -1L;
+            }
             int alphaInt = 255;
             if (timeElapsed <= 2000) {
                 float alpha = Mth.clamp(timeElapsed / 10.0F / 5.0F * 0.5F, 0.0F, 1.0F);
@@ -203,17 +206,14 @@ public class SugarSettingsScreen extends Screen {
             }
             int textColor = ARGBHelper.toChatColor(alphaInt, 255, 255, 255);
             Gui.drawCenteredString(poseStack, this.font, this.toastText, this.width / 2, this.editorY - 18, textColor);
-            if (timeElapsed > 10000) {
-                this.toastText = "";
-                this.lastToastShown = -1L;
-            }
         }
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        int deltaMultiplier = EnumSettings.parse(MouseScroll.NORMAL, SugarAPI.MOD_ID, "scrollDelta").getDelta();
         if ((this.buttonTookSize - this.scrollDelta > this.editorHeight && delta < 0.0D) || (delta > 0.0D && this.scrollDelta > 0)) {
-            this.scrollDelta -= 4 * delta;
+            this.scrollDelta -= deltaMultiplier * delta;
         }
         return super.mouseScrolled(mouseX, mouseY, delta);
     }
@@ -290,6 +290,8 @@ public class SugarSettingsScreen extends Screen {
     }
 
     private void showConfig(String modName, String modid) {
+        this.setToastText("Currently showing for: " + ChatFormatting.RED + modName);
+        this.settingsButtons.forEach(this::removeWidget);
         this.settingsButtons.clear();
         for (String s : ALL_CONFIG.keySet()) {
             if (ALL_CONFIG.get(s).equals(modName)) {
@@ -453,10 +455,10 @@ public class SugarSettingsScreen extends Screen {
         JsonConfig.set(SugarAPI.MOD_ID, "lastConfigId", "");
         this.clearWidgets();
         this.init();
-        this.makeToastText("Reloaded!");
+        this.setToastText("Reloaded!");
     }
 
-    private void makeToastText(String toastText) {
+    private void setToastText(String toastText) {
         this.toastText = toastText;
         this.lastToastShown = System.currentTimeMillis();
     }

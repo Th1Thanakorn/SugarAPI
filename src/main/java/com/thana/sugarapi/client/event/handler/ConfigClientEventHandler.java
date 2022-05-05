@@ -1,6 +1,7 @@
 package com.thana.sugarapi.client.event.handler;
 
 import com.thana.sugarapi.client.config.ClientConfig;
+import com.thana.sugarapi.client.config.handler.MouseScroll;
 import com.thana.sugarapi.client.event.ConfigCreationEvent;
 import com.thana.sugarapi.client.event.ConfigNameCreationEvent;
 import com.thana.sugarapi.client.event.RightClickConfigButtonEvent;
@@ -10,6 +11,7 @@ import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.StringEditor;
 import com.thana.sugarapi.common.utils.TextWrapper;
 import com.thana.sugarapi.common.utils.config.ChatFormattingSettings;
+import com.thana.sugarapi.common.utils.config.EnumSettings;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -38,6 +40,11 @@ public class ConfigClientEventHandler {
                     event.setSettingWidget(button);
                     event.setCanceled(true);
                 }
+            }
+            else if (event.is("scrollDelta")) {
+                Button button = new EnumSettings<>(SugarAPI.MOD_ID, key, MouseScroll.fromName(ClientConfig.getString(key)), x, y, width, height).create(ChatFormatting.GOLD);
+                event.setSettingWidget(button);
+                event.setCanceled(true);
             }
         }
     }

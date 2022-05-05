@@ -13,6 +13,15 @@ public enum MouseScroll implements ConfigEnum<MouseScroll> {
         this.delta = delta;
     }
 
+    public static MouseScroll fromName(String text) {
+        for (MouseScroll scroll : values()) {
+            if (scroll.name().equalsIgnoreCase(text)) {
+                return scroll;
+            }
+        }
+        return null;
+    }
+
     @Override
     public MouseScroll parse(String text) {
         for (MouseScroll scroll : values()) {
@@ -24,18 +33,18 @@ public enum MouseScroll implements ConfigEnum<MouseScroll> {
     }
 
     @Override
-    public MouseScroll next(MouseScroll scroll) {
-        return values()[(scroll.ordinal() + 1) % values().length];
+    public MouseScroll next() {
+        return values()[(this.ordinal() + 1) % values().length];
     }
 
     @Override
-    public MouseScroll previous(MouseScroll scroll) {
-        return values()[(values().length + (scroll.ordinal() - 1)) % values().length];
+    public MouseScroll previous() {
+        return values()[(values().length + (this.ordinal() - 1)) % values().length];
     }
 
     @Override
-    public String save(MouseScroll scroll) {
-        return scroll.name().toUpperCase();
+    public String save() {
+        return this.name().toUpperCase();
     }
 
     public int getDelta() {

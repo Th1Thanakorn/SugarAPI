@@ -4,9 +4,9 @@ public interface ConfigEnum<E> {
 
     E parse(String text);
 
-    E next(E value);
+    E next();
 
-    E previous(E value);
+    E previous();
 
-    String save(E value);
+    String save();
 }

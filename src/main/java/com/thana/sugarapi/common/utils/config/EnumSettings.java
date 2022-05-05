@@ -3,22 +3,28 @@ package com.thana.sugarapi.common.utils.config;
 import com.google.gson.JsonObject;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.TextWrapper;
-import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 
-public record EnumSettings<V, E extends ConfigEnum<V>>(String modid, String key, E enumHolder, int x, int y, int width, int height) {
+public record EnumSettings<E extends ConfigEnum<E>>(String modid, String key, E currentValue, int x, int y, int width, int height) {
 
-    public AbstractWidget create() {
-        return new Button(this.x, this.y, this.width, this.height, TextWrapper.wrapped(this.enumHolder.save(this.getCurrent())), (button) -> {
-            V value = this.getCurrent();
-            V next = this.enumHolder.next(value);
-            JsonConfig.set(this.modid, this.key, this.enumHolder.save(next));
+    public Button create(ChatFormatting color) {
+        return new Button(this.x, this.y, this.width, this.height, TextWrapper.wrapped(this.currentValue.save(), color), (button) -> {
+            E value = this.getCurrent();
+            E next = value.next();
+            button.setMessage(TextWrapper.wrapped(next.save(), color));
+            JsonConfig.set(this.modid, this.key, next.save());
         });
     }
 
-    public V getCurrent() {
+    public E getCurrent() {
         JsonObject object = JsonConfig.modifiableConfig(this.modid);
-        String enumString = object.get(key).getAsString();
-        return this.enumHolder.parse(enumString);
+        String enumString = object.get(this.key).getAsString();
+        return this.currentValue.parse(enumString);
+    }
+
+    public static <F extends ConfigEnum<F>> F parse(F example, String modid, String key) {
+        String enumString = JsonConfig.modifiableConfig(modid).get(key).getAsString();
+        return example.parse(enumString);
     }
 }

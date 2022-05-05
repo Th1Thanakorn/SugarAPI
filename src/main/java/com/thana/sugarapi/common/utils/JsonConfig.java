@@ -1,6 +1,8 @@
 package com.thana.sugarapi.common.utils;
 
 import com.google.gson.*;
+import com.thana.sugarapi.common.api.annotations.ModDevelopment;
+import com.thana.sugarapi.common.api.annotations.SafeParse;
 import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.config.AdjustableVariable;
 
@@ -9,11 +11,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class JsonConfig {
 
     private static final SimpleLogger LOGGER = new SimpleLogger("JsonConfig");
     public static final String DIR_CLIENT = "./config/sugarapi/client/";
+    public static final String DIR_KEY_CLIENT = "./config/sugarapi/client/key/";
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final String modid;
@@ -144,6 +148,27 @@ public class JsonConfig {
         }
     }
 
+    @SafeParse
+    @ModDevelopment
+    public void createKeyLoggerClient() {
+        File file = new File(DIR_KEY_CLIENT + String.format("%s.properties", this.modid));
+        List<String> keys = this.config.keySet().stream().toList();
+        try {
+            if (file.createNewFile()) LOGGER.debug("Make key logger container for modid: " + this.modid);
+            FileWriter writer = new FileWriter(file);
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < keys.size(); i++) {
+                builder.append(String.format("%s=1", keys.get(i)));
+                if (i != keys.size() - 1) builder.append("\n");
+            }
+            writer.write(builder.toString());
+            writer.close();
+        }
+        catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
     public static JsonObject readClient(String modid) {
         JsonObject object = new JsonObject();
         File dir = new File(DIR_CLIENT);
@@ -246,7 +271,9 @@ public class JsonConfig {
 
     public static void defaultCreatePath() {
         File dir = new File(DIR_CLIENT);
+        File key = new File(DIR_KEY_CLIENT);
         if (dir.mkdirs()) LOGGER.debug("Create default directory of config path");
+        if (key.mkdirs()) LOGGER.debug("Create keys container directory of config path");
     }
 
     public static void updateConfig(String modid, JsonObject config) {
