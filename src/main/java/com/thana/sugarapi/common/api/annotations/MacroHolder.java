@@ -1,11 +1,13 @@
-package com.thana.sugarapi.common.api.oid;
+package com.thana.sugarapi.common.api.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Overridden {
+@Target(ElementType.TYPE)
+public @interface MacroHolder {
+
+    String value();
 }

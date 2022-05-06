@@ -3,24 +3,23 @@ package com.thana.sugarapi.common.api.oid;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class OIDConfigUtil {
+public class OIDUtil {
 
-    private static final HashMap<Method, Method> SYNC_MAP = new HashMap<>();
+    private static final ArrayList<Method> SYNC_MAP = new ArrayList<>();
 
     public static void scanPackage(String packageName) {
         try {
             for (Class<?> c : getClasses(packageName)) {
                 if (c.isAnnotationPresent(OIDClass.class)) {
-                    OIDClass annotation = c.getAnnotation(OIDClass.class);
                     for (Method method : c.getDeclaredMethods()) {
                         if (method.isAnnotationPresent(Synchronized.class)) {
-                            Method targetMethod = annotation.value().getDeclaredMethod(method.getName(), method.getParameterTypes());
-                            SYNC_MAP.put(targetMethod, method);
+                            SYNC_MAP.add(method);
                         }
                     }
                 }
@@ -28,6 +27,19 @@ public class OIDConfigUtil {
         }
         catch (Exception exception) {
             exception.printStackTrace();
+        }
+        send();
+    }
+
+    public static void send() {
+        for (Method method : SYNC_MAP) {
+            try {
+                Object instance = method.getDeclaringClass().getConstructor().newInstance();
+                method.setAccessible(true);
+                method.invoke(instance);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

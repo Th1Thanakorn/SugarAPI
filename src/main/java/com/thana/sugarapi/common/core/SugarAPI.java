@@ -3,7 +3,8 @@ package com.thana.sugarapi.common.core;
 import com.thana.sugarapi.client.event.handler.ClientEventHandler;
 import com.thana.sugarapi.client.event.handler.ConfigClientEventHandler;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
-import com.thana.sugarapi.common.api.oid.OIDConfigUtil;
+import com.thana.sugarapi.client.keys.ModKeys;
+import com.thana.sugarapi.common.api.oid.OIDUtil;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.SimpleLogger;
 import net.minecraftforge.api.distmarker.Dist;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 public class SugarAPI {
 
     public static final SimpleLogger LOGGER = new SimpleLogger("SugarAPI");
-    public static final String MOD_PACKAGE = "com.thana";
+    public static final String MOD_PACKAGE = "com.thana.sugarapi.common.macro";
     public static final String MOD_ID = "sugarapi";
     public static final String MOD_VERSION = "2.2.0";
 
@@ -35,9 +36,10 @@ public class SugarAPI {
         JsonConfig.defaultCreatePath();
         SugarAPIClientConfigBuilder.create();
         SugarSettingsScreen.putConfig(SugarAPI.MOD_ID, "SugarAPI");
-        OIDConfigUtil.scanPackage(SugarAPI.MOD_PACKAGE);
+        OIDUtil.scanPackage(SugarAPI.MOD_PACKAGE);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
+            this.registerKeys();
             this.clientEvent();
         }
         else {
@@ -66,5 +68,9 @@ public class SugarAPI {
     private void clientEvent() {
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
         MinecraftForge.EVENT_BUS.register(new ConfigClientEventHandler());
+    }
+
+    private void registerKeys() {
+        ModKeys.init();
     }
 }
