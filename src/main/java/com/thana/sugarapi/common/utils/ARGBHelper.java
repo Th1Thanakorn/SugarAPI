@@ -41,11 +41,33 @@ public class ARGBHelper {
     }
 
     public static String fastRgbToHex(int r, int g, int b) {
-        return "#" + Integer.toHexString(toChatColor(r, g, b)).substring(2);
+        return "#" + Integer.toHexString(toChatColor(r, g, b));
     }
 
     public static String fastArgbToHex(int a, int r, int g, int b) {
-        String hex = Integer.toHexString(toChatColor(a, r, g, b));
-        return "#" + hex.substring(hex.length() - 6);
+        return "#" + Integer.toHexString(toChatColor(a, r, g, b));
+    }
+
+    public static int blend(int colorA, int colorB, float i) {
+        if (i > 1)
+            i = 1.0F;
+        else if (i < 0)
+            i = 0.0F;
+
+        float j = 1F - i;
+        int k1 = (colorA >> 24 & 0xff);
+        int k2 = ((colorA & 0xff0000) >> 16);
+        int k3 = ((colorA & 0xff00) >> 8);
+        int k4 = (colorA & 0xff);
+
+        int l1 = (colorB >> 24 & 0xff);
+        int l2 = ((colorB & 0xff0000) >> 16);
+        int l3 = ((colorB & 0xff00) >> 8);
+        int l4 = (colorB & 0xff);
+        int a = (int) (k1 * j + (l1 * i));
+        int r = (int) (k2 * j + (l2 * i));
+        int g = (int) (k3 * j + (l3 * i));
+        int b = (int) (k4 * j + (l4 * i));
+        return to32BitColor(a, r, g, b);
     }
 }
