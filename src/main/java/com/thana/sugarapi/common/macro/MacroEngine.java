@@ -46,4 +46,14 @@ public class MacroEngine {
     public static boolean interrupted(MacroInjection macro) {
         return interrupted.contains(macro.getClass().getAnnotation(MacroHolder.class).value());
     }
+
+    public static void validDelay(int delay) {
+        if (delay < 0) {
+            try {
+                throw new Exception("Delay value should not be less than 0");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

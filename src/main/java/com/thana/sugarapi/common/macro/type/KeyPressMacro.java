@@ -1,6 +1,7 @@
 package com.thana.sugarapi.common.macro.type;
 
 import com.thana.sugarapi.common.api.annotations.Legacy;
+import com.thana.sugarapi.common.macro.MacroEngine;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
@@ -12,7 +13,7 @@ import java.util.List;
 // but so bad that the keybinds doesn't work properly
 // as the same as the last version.
 //
-// Written by: HTMLChannel
+// Author: HTMLChannel
 // *****************************************************
 @Legacy(old = true)
 public class KeyPressMacro {
@@ -21,6 +22,7 @@ public class KeyPressMacro {
 
     public static void press(String key, int delay)
     {
+        MacroEngine.validDelay(delay);
         for (KeyMapping key1 : Minecraft.getInstance().options.keyMappings)
         {
             if (key1.getName().equals(key) && Minecraft.getInstance().player != null

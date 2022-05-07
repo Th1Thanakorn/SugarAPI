@@ -32,7 +32,7 @@ public class MacroObject extends NotRecord {
             this.delay = delay;
         }
 
-        public String getKey() {
+        public String getType() {
             return type;
         }
 

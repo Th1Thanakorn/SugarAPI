@@ -37,11 +37,11 @@ public class SimpleLogger {
     }
 
     public void warning(String text) {
-        this.logger.debug(WARNING, text);
+        this.logger.warn(WARNING, text);
     }
 
     public void warning(String text, Object... params) {
-        this.logger.info(WARNING, text, params);
+        this.logger.warn(WARNING, text, params);
     }
 
     public void error(String text) {

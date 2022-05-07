@@ -12,7 +12,8 @@
     "MixinDebugScreenOverlay",
     "MixinFogRenderer",
     "MixinGui",
-    "MixinLocalPlayer"
+    "MixinLocalPlayer",
+    "MixinPlayerTabOverlay"
   ],
   "injectors": {
     "defaultRequire": 1

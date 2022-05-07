@@ -11,10 +11,14 @@ import com.thana.sugarapi.common.api.oid.Synchronized;
 import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.macro.MacroObject.Task;
 import com.thana.sugarapi.common.macro.type.KeyPressMacro;
+import com.thana.sugarapi.common.macro.type.MessagingMacro;
+import com.thana.sugarapi.common.macro.type.MouseClickMacro;
+import com.thana.sugarapi.common.utils.SimpleLogger;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -29,8 +33,11 @@ public class Macro implements MacroInjection {
     private static final String MACRO_DIR = "./macro/";
     private static final String MACRO_FILE = MACRO_DIR + SugarAPI.MOD_ID + "-macro.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final SimpleLogger LOGGER = new SimpleLogger("Macro");
 
     private final Minecraft mc = Minecraft.getInstance();
+    private double mouseX = this.mc.mouseHandler.xpos();
+    private double mouseY = this.mc.mouseHandler.ypos();
     private MacroObject macroObject = null;
 
     @Synchronized
@@ -55,6 +62,12 @@ public class Macro implements MacroInjection {
                 this.mc.player.sendMessage(new TextComponent("Macro Refreshed!"), Util.NIL_UUID);
             }
         }
+    }
+
+    @SubscribeEvent
+    public void drawScreenEvent(ScreenEvent.DrawScreenEvent event) {
+        this.mouseX = event.getMouseX();
+        this.mouseY = event.getMouseY();
     }
 
     @Override
@@ -91,8 +104,11 @@ public class Macro implements MacroInjection {
         for (Task task : tasks) {
             String optional = task.getOptional();
             int delay = task.getDelay();
-            switch (task.getKey()) {
-                case "press_key": KeyPressMacro.press(optional, delay);
+            switch (task.getType()) {
+                case "press_key" -> KeyPressMacro.press(optional, delay);
+                case "mouse_click" -> MouseClickMacro.click(optional, delay, this.mouseX, this.mouseY);
+                case "send_message" -> MessagingMacro.sendChat(optional, delay);
+                default -> LOGGER.warning("Unknown macro type: " + task.getType());
             }
         }
     }
