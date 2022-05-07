@@ -48,7 +48,7 @@ public class ARGBHelper {
         return "#" + Integer.toHexString(toChatColor(a, r, g, b));
     }
 
-    public static int blend(int colorA, int colorB, float i) {
+    public static int mix(int colorA, int colorB, float i) {
         if (i > 1)
             i = 1F;
         else if (i < 0)
