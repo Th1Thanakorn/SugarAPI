@@ -50,24 +50,26 @@ public class ARGBHelper {
 
     public static int blend(int colorA, int colorB, float i) {
         if (i > 1)
-            i = 1.0F;
+            i = 1F;
         else if (i < 0)
-            i = 0.0F;
+            i = 0F;
 
         float j = 1F - i;
-        int k1 = (colorA >> 24 & 0xff);
-        int k2 = ((colorA & 0xff0000) >> 16);
-        int k3 = ((colorA & 0xff00) >> 8);
-        int k4 = (colorA & 0xff);
 
-        int l1 = (colorB >> 24 & 0xff);
-        int l2 = ((colorB & 0xff0000) >> 16);
-        int l3 = ((colorB & 0xff00) >> 8);
-        int l4 = (colorB & 0xff);
-        int a = (int) (k1 * j + (l1 * i));
-        int r = (int) (k2 * j + (l2 * i));
-        int g = (int) (k3 * j + (l3 * i));
-        int b = (int) (k4 * j + (l4 * i));
+        int a1 = alpha(colorA);
+        int r1 = red(colorA);
+        int g1 = green(colorA);
+        int b1 = blue(colorA);
+
+        int a2 = alpha(colorB);
+        int r2 = red(colorB);
+        int g2 = green(colorB);
+        int b2 = blue(colorB);
+
+        int a = (int)((a1 * j) + (a2 * i));
+        int r = (int)((r1 * j) + (r2 * i));
+        int g = (int)((g1 * j) + (g2 * i));
+        int b = (int)((b1 * j) + (b2 * i));
         return to32BitColor(a, r, g, b);
     }
 }
