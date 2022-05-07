@@ -48,13 +48,12 @@ public class ARGBHelper {
         return "#" + Integer.toHexString(toChatColor(a, r, g, b));
     }
 
-    public static int mix(int colorA, int colorB, float i) {
-        if (i > 1)
-            i = 1F;
-        else if (i < 0)
-            i = 0F;
-
-        float j = 1F - i;
+    public static int mix(float saturation, int colorA, int colorB) {
+        if (saturation > 1)
+            saturation = 1.0F;
+        else if (saturation < 0)
+            saturation = 0.F;
+        float j = 1.0F - saturation;
 
         int a1 = alpha(colorA);
         int r1 = red(colorA);
@@ -66,10 +65,10 @@ public class ARGBHelper {
         int g2 = green(colorB);
         int b2 = blue(colorB);
 
-        int a = (int)((a1 * j) + (a2 * i));
-        int r = (int)((r1 * j) + (r2 * i));
-        int g = (int)((g1 * j) + (g2 * i));
-        int b = (int)((b1 * j) + (b2 * i));
+        int a = (int)((a1 * j) + (a2 * saturation));
+        int r = (int)((r1 * j) + (r2 * saturation));
+        int g = (int)((g1 * j) + (g2 * saturation));
+        int b = (int)((b1 * j) + (b2 * saturation));
         return to32BitColor(a, r, g, b);
     }
 }
