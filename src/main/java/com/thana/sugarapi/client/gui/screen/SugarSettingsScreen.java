@@ -221,6 +221,9 @@ public class SugarSettingsScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
+        if (mouseY < this.editorY || mouseY > this.editorBottom) {
+            return false;
+        }
         for (GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractWidget widget && listener.isMouseOver(mouseX, mouseY) && mouseButton == GLFW.GLFW_MOUSE_BUTTON_RIGHT && this.keySettingsMap.containsValue(widget)) {
                 this.setFocused(listener);

@@ -75,6 +75,9 @@ public class ConfigClientEventHandler {
                     event.playDownSound();
                 }
             }
+            else if (key.equals("scrollDelta")) {
+                EnumSettings.reverseClick(event, MouseScroll.NORMAL, ChatFormatting.GOLD);
+            }
         }
     }
 

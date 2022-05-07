@@ -26,6 +26,10 @@ public class RightClickConfigButtonEvent extends Event {
         return this.key;
     }
 
+    public String getModid() {
+        return this.modid;
+    }
+
     public AbstractWidget getWidget() {
         return this.widget;
     }
