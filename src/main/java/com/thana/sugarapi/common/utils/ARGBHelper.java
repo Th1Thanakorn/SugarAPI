@@ -35,4 +35,17 @@ public class ARGBHelper {
     public static int toChatColor(int r, int g, int b) {
         return r * 65536 + g * 256 + b;
     }
+
+    public static String rgbToHex(int r, int g, int b) {
+        return String.format("#%02x%02x%02x", r, g, b);
+    }
+
+    public static String fastRgbToHex(int r, int g, int b) {
+        return "#" + Integer.toHexString(toChatColor(r, g, b)).substring(2);
+    }
+
+    public static String fastArgbToHex(int a, int r, int g, int b) {
+        String hex = Integer.toHexString(toChatColor(a, r, g, b));
+        return "#" + hex.substring(hex.length() - 6);
+    }
 }
