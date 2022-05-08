@@ -12,6 +12,7 @@
     "MixinDebugScreenOverlay",
     "MixinFogRenderer",
     "MixinGui",
+    "MixinHttpTexture",
     "MixinLocalPlayer",
     "MixinPlayerTabOverlay"
   ],
