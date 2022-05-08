@@ -90,7 +90,10 @@ public class Macro implements MacroInjection {
             builder.append((char) c);
         }
         MacroObject macroObject = GSON.fromJson(builder.toString(), MacroObject.class);
-        if (macroObject == null) return;
+        if (macroObject == null) {
+            LOGGER.warning("Macro could not be loadded, skipped 1 task");
+            return;
+        }
         if (!macroObject.isValid()) {
             MacroEngine.interrupt(this);
         }

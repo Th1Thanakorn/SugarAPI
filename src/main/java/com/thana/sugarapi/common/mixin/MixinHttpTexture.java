@@ -93,9 +93,11 @@ public abstract class MixinHttpTexture extends SimpleTexture {
 
                                     });
                                 }
-                            } catch (Exception exception) {
+                            }
+                            catch (Exception exception) {
                                 LOGGER.error("Couldn't download http texture", exception);
-                            } finally {
+                            }
+                            finally {
                                 if (httpurlconnection != null) {
                                     httpurlconnection.disconnect();
                                 }
