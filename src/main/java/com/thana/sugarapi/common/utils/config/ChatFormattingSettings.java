@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 public final class ChatFormattingSettings {
 
-    public static final ChatFormatting[] onlyColor = Arrays.stream(ChatFormatting.values()).filter((color) -> color != ChatFormatting.ITALIC && color != ChatFormatting.BOLD && color != ChatFormatting.RESET && color != ChatFormatting.UNDERLINE && color != ChatFormatting.OBFUSCATED && color != ChatFormatting.STRIKETHROUGH).toList().toArray(ChatFormatting[]::new);
+    public static final ChatFormatting[] onlyColor = Arrays.stream(ChatFormatting.values()).filter((color) -> color.getColor() != null).toList().toArray(ChatFormatting[]::new);
 
     public static Button create(int x, int y, int width, int height, String key, String color, String modid) {
         ChatFormatting formatting = ChatFormatting.getByName(color);

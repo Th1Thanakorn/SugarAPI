@@ -19,6 +19,7 @@ public class SugarAPIClientConfigBuilder {
         CONFIG.put("headerColor", "aqua");
         CONFIG.put("scrollDelta", MouseScroll.SLOW.toString());
         CONFIG.put("showPingText", false);
+        CONFIG.put("enablePlayerViewer", true);
 
         CONFIG.createConfigClient();
         CONFIG.createKeyLoggerClient();
