@@ -9,6 +9,7 @@
   ],
   "client": [
     "MixinAbstractContainerScreen",
+    "MixinAdvancementToast",
     "MixinDebugScreenOverlay",
     "MixinFogRenderer",
     "MixinGui",

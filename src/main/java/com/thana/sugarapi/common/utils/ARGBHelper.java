@@ -1,5 +1,7 @@
 package com.thana.sugarapi.common.utils;
 
+import net.minecraft.util.Mth;
+
 public class ARGBHelper {
 
     public static int alpha(int alpha) {
@@ -70,5 +72,27 @@ public class ARGBHelper {
         int g = (int)((g1 * j) + (g2 * saturation));
         int b = (int)((b1 * j) + (b2 * saturation));
         return to32BitColor(a, r, g, b);
+    }
+
+    public static int gradient(int colorFrom, int colorTo, float scale) {
+        int r = (int) (red(colorFrom) * scale + red(colorTo) * (1.0F - scale));
+        int g = (int) (green(colorFrom) * scale + green(colorTo) * (1.0F - scale));
+        int b = (int) (blue(colorFrom) * scale + blue(colorTo) * (1.0F - scale));
+        return toChatColor(r, g, b);
+    }
+
+    public static float[] rgbArray(int r, int g, int b) {
+        return new float[]{r / 255.0F, g / 255.0F, b / 255.0F};
+    }
+
+    public static float[] rgbaArray(int r, int g, int b, int a) {
+        return new float[]{r / 255.0F, g / 255.0F, b / 255.0F, a / 255.0F};
+    }
+
+    public static float[] decimalArray(int color) {
+        int r = red(color);
+        int g = green(color);
+        int b = blue(color);
+        return rgbArray(r, g, b);
     }
 }
