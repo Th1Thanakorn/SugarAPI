@@ -7,6 +7,10 @@ import net.minecraft.network.chat.TextComponent;
 
 public class StringEditor {
 
+    // I know it's not possible right now to split text perfectly
+    // Because the ways that Minecraft holds all the fonts are completely bad
+    // They hold font as FormattedCharSequence which is not possible to our method
+    // Written by: HTMLChannel
     public static MutableComponent cut(Component text, int length, String suffix) {
         if (text.getString().length() > length) {
             MutableComponent component = new TextComponent("");

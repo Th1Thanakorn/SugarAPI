@@ -2,17 +2,23 @@ package com.thana.sugarapi.client.event.handler;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.thana.sugarapi.client.config.ClientConfig;
+import com.thana.sugarapi.client.gui.screen.CommandEditorScreen;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
+import com.thana.sugarapi.client.gui.widget.button.ItemButton;
 import com.thana.sugarapi.client.gui.widget.button.SugarSettingsButton;
 import com.thana.sugarapi.common.utils.StringEditor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.nbt.TextComponentTagVisitor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -41,9 +47,13 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onScreenInit(ScreenEvent.InitScreenEvent event) {
+        int width = this.mc.getWindow().getGuiScaledWidth();
+        int height = this.mc.getWindow().getGuiScaledHeight();
         if (event.getScreen() instanceof PauseScreen) {
-            int height = this.mc.getWindow().getGuiScaledHeight();
             event.addListener(new SugarSettingsButton(8, height - 22, event.getScreen(), (button) -> this.mc.setScreen(new SugarSettingsScreen())));
+        }
+        else if (event.getScreen() instanceof ChatScreen) {
+            event.addListener(new ItemButton(width - 26, (int) (height - 34 - this.mc.options.chatHeightFocused), TextComponent.EMPTY, new ItemStack(Items.PAPER), (button) -> this.mc.setScreen(new CommandEditorScreen())));
         }
     }
 
