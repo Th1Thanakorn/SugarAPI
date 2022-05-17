@@ -1,7 +1,5 @@
 package com.thana.sugarapi.common.utils;
 
-import net.minecraft.util.Mth;
-
 public class ARGBHelper {
 
     public static int alpha(int alpha) {
