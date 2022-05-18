@@ -72,6 +72,70 @@ public class ARGBHelper {
         return to32BitColor(a, r, g, b);
     }
 
+    public static int increaseGreen(int colorFrom, int colorTo, float stepSize, float steps) {
+        int red1 = red(colorFrom);
+        int blue1 = blue(colorFrom);
+        int red2 = red(colorTo);
+        int blue2 = blue(colorTo);
+
+        int minGreen = Math.min(green(colorFrom), green(colorTo));
+        int maxGreen = Math.max(green(colorFrom), green(colorTo));
+
+        float s = steps * stepSize;
+        int i = 0;
+        while (s > maxGreen) {
+            s -= maxGreen;
+            i++;
+        }
+        int green = i % 2 == 1 ? (int) (maxGreen - s) : (int) (minGreen + s);
+        return toChatColor(red1 | red2, green, blue1 | blue2);
+    }
+
+    public static int increaseRed(int colorFrom, int colorTo, float stepSize, float steps) {
+        int green1 = green(colorFrom);
+        int blue1 = blue(colorFrom);
+        int green2 = green(colorTo);
+        int blue2 = blue(colorTo);
+
+        int minRed = Math.min(red(colorFrom), red(colorTo));
+        int maxRed = Math.max(red(colorFrom), red(colorTo));
+
+        float s = steps * stepSize;
+        int i = 0;
+        while (s > maxRed) {
+            s -= maxRed;
+            i++;
+        }
+        int red = i % 2 == 1 ? (int) (maxRed - s) : (int) (minRed + s);
+        return toChatColor(red, green1 | green2, blue1 | blue2);
+    }
+
+    public static int increaseBlue(int colorFrom, int colorTo, float stepSize, float steps) {
+        int red1 = red(colorFrom);
+        int green1 = green(colorFrom);
+        int red2 = red(colorTo);
+        int green2 = green(colorTo);
+
+        int minBlue = Math.min(blue(colorFrom), blue(colorTo));
+        int maxBlue = Math.max(blue(colorFrom), blue(colorTo));
+
+        float s = steps * stepSize;
+        int i = 0;
+        while (s > maxBlue) {
+            s -= maxBlue;
+            i++;
+        }
+        int blue = i % 2 == 1 ? (int) (maxBlue - s) : (int) (minBlue + s);
+        return toChatColor(red1 | red2, green1 | green2, blue);
+    }
+
+    public static int increase(int colorFrom, int colorTo, float stepSize, float steps) {
+        int red = red(increaseRed(colorFrom, colorTo, stepSize, steps));
+        int green = green(increaseGreen(colorFrom, colorTo, stepSize, steps));
+        int blue = blue(increaseBlue(colorFrom, colorTo, stepSize, steps));
+        return toChatColor(red, green, blue);
+    }
+
     public static int gradient(int colorFrom, int colorTo, float scale) {
         int r = (int) (red(colorFrom) * scale + red(colorTo) * (1.0F - scale));
         int g = (int) (green(colorFrom) * scale + green(colorTo) * (1.0F - scale));

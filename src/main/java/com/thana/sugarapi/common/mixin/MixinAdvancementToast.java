@@ -45,9 +45,9 @@ public class MixinAdvancementToast {
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.enableBlend();
         if (displayinfo != null && displayinfo.getFrame() == FrameType.CHALLENGE) {
-            int colorFrom = ARGBHelper.toChatColor(170, 85, 200);
-            int colorTo = ARGBHelper.toChatColor(210, 110, 255);
-            int graded = ARGBHelper.gradient(colorFrom, colorTo, -delta / 6000.0F);
+            int colorFrom = ARGBHelper.toChatColor(130, 5, 150);
+            int colorTo = ARGBHelper.toChatColor(207, 114, 222);
+            int graded = ARGBHelper.increaseGreen(colorFrom, colorTo, 0.2F, delta);
             float[] color = ARGBHelper.decimalArray(graded);
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
             RenderSystem.setShaderColor(color[0], color[1], color[2], 1.0F);
