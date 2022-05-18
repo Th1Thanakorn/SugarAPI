@@ -1,9 +1,12 @@
 package com.thana.sugarapi.common.utils;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
 
 public class StringEditor {
 
@@ -30,6 +33,10 @@ public class StringEditor {
         else {
             return (MutableComponent) text;
         }
+    }
+
+    public static FormattedCharSequence reorderingCut(MutableComponent text, int length, String suffix) {
+        return text.getString().length() <= length ? Language.getInstance().getVisualOrder(text) : Minecraft.getInstance().font.split(text, length).get(0);
     }
 
     public static String upperFirst(String text) {
