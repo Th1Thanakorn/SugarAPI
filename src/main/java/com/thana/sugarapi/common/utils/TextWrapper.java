@@ -7,6 +7,10 @@ import net.minecraft.network.chat.TextComponent;
 
 public class TextWrapper {
 
+    public static MutableComponent newText() {
+        return wrapped("", Style.EMPTY);
+    }
+
     public static MutableComponent wrapped(String text) {
         return wrapped(text, Style.EMPTY);
     }
