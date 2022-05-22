@@ -6,17 +6,17 @@ import net.minecraftforge.eventbus.api.Event;
 @Cancelable
 public class ConfigNameCreationEvent extends Event {
 
-    private final String name;
+    private final String key;
     private final String modid;
     private String ret;
 
-    public ConfigNameCreationEvent(String modid, String name) {
+    public ConfigNameCreationEvent(String modid, String key) {
         this.modid = modid;
-        this.name = name;
+        this.key = key;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return this.key;
     }
 
     public void setReturn(String ret) {

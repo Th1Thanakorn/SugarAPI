@@ -52,11 +52,13 @@ public class ConfigClientEventHandler {
     @SubscribeEvent
     public void onNameCreation(ConfigNameCreationEvent event) {
         if (event.sameMod(SugarAPI.MOD_ID)) {
-            switch (event.getName()) {
+            switch (event.getKey()) {
                 case "nbtLength" -> event.setReturn("NBT Length");
                 case "showNbt" -> event.setReturn("Show NBT");
-                default -> event.setReturn(this.camelCaseChange(event.getName()));
             }
+        }
+        else {
+            event.setReturn(this.camelCaseChange(event.getKey()));
         }
     }
 

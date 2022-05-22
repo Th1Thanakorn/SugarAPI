@@ -25,7 +25,7 @@ public class SugarAPI {
 
     public static final SimpleLogger LOGGER = new SimpleLogger("SugarAPI");
     public static final String MOD_ID = "sugarapi";
-    public static final String MOD_VERSION = "2.3.0";
+    public static final String MOD_VERSION = "2.3.1";
     public static final String MACRO_PACKAGE = "com.thana.sugarapi.common.macro";
 
     public SugarAPI() {

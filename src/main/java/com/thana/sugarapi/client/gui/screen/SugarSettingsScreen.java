@@ -351,6 +351,7 @@ public class SugarSettingsScreen extends Screen {
                             boolean value = JsonConfig.modifiableConfig(finalModid).get(key).getAsBoolean();
                             JsonConfig.set(finalModid, key, !value);
                             b.setMessage(new TextComponent(!value ? ChatFormatting.GREEN + "YES" : ChatFormatting.RED + "NO"));
+                            MinecraftForge.EVENT_BUS.post(new ConfigChangeEvent(finalModid, key));
                             customJob.run();
                         });
                         this.addRenderableWidget(button);
@@ -367,6 +368,7 @@ public class SugarSettingsScreen extends Screen {
                         box.setValue(JsonConfig.modifiableConfig(modid).get(key).getAsString());
                         box.setResponder((text) -> {
                             JsonConfig.set(finalModid, key, text);
+                            MinecraftForge.EVENT_BUS.post(new ConfigChangeEvent(finalModid, key));
                             customJob.run();
                         });
                         this.addRenderableWidget(box);
@@ -403,6 +405,7 @@ public class SugarSettingsScreen extends Screen {
                             SliderButton slider = new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().intValue(), true, (widget) -> {
                                 int value = widget.getValueInt();
                                 JsonConfig.set(finalModid, key, value, min, max);
+                                MinecraftForge.EVENT_BUS.post(new ConfigChangeEvent(finalModid, key));
                                 customJob.run();
                             });
                             this.addRenderableWidget(slider);
@@ -417,6 +420,7 @@ public class SugarSettingsScreen extends Screen {
                             SliderButton slider = new SliderButton(buttonX, buttonY, buttonWidth, 20, new TextComponent("Value: ").withStyle(ChatFormatting.GOLD), TextComponent.EMPTY, min, max, primitiveObject.getValue().doubleValue(), 0.1D, 0, true, (widget) -> {
                                 double value = widget.getValue();
                                 JsonConfig.set(finalModid, key, value, min, max);
+                                MinecraftForge.EVENT_BUS.post(new ConfigChangeEvent(finalModid, key));
                                 customJob.run();
                             });
                             this.addRenderableWidget(slider);
