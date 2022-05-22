@@ -7,6 +7,7 @@ import com.thana.sugarapi.client.keys.ModKeys;
 import com.thana.sugarapi.common.api.oid.OIDUtil;
 import com.thana.sugarapi.common.utils.JsonConfig;
 import com.thana.sugarapi.common.utils.SimpleLogger;
+import com.thana.sugarapi.common.utils.VersionChecker;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.InterModComms;
@@ -37,6 +38,7 @@ public class SugarAPI {
         SugarAPIClientConfigBuilder.create();
         SugarSettingsScreen.putConfig(SugarAPI.MOD_ID, "SugarAPI");
         OIDUtil.scanPackage(SugarAPI.MACRO_PACKAGE);
+        VersionChecker.tryCheck(SugarAPI.MOD_ID, SugarAPI.MOD_VERSION);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             this.registerKeys();

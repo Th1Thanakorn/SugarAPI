@@ -6,7 +6,11 @@ import com.thana.sugarapi.client.gui.screen.CommandEditorScreen;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
 import com.thana.sugarapi.client.gui.widget.button.ItemButton;
 import com.thana.sugarapi.client.gui.widget.button.SugarSettingsButton;
+import com.thana.sugarapi.common.api.annotations.ModHolder;
+import com.thana.sugarapi.common.core.SugarAPI;
 import com.thana.sugarapi.common.utils.StringEditor;
+import com.thana.sugarapi.common.utils.TextWrapper;
+import com.thana.sugarapi.common.utils.VersionChecker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -19,10 +23,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 
+@ModHolder(SugarAPI.MOD_ID)
 public class ClientEventHandler {
 
     private final Minecraft mc = Minecraft.getInstance();
@@ -52,6 +58,14 @@ public class ClientEventHandler {
         }
         else if (event.getScreen() instanceof ChatScreen) {
             event.addListener(new ItemButton(width - 26, (int) (height - 34 - this.mc.options.chatHeightFocused), TextComponent.EMPTY, new ItemStack(Items.PAPER), (button) -> this.mc.setScreen(new CommandEditorScreen())));
+        }
+    }
+
+    @SubscribeEvent
+    public void onEntityJoinWorldEvent(EntityJoinWorldEvent event) {
+        if (this.mc.player != null && event.getEntity() == this.mc.player && VersionChecker.hasNewerVersion()) {
+            String version = VersionChecker.getLatestVersion();
+            this.mc.player.sendMessage(TextWrapper.wrapped("Found newer version for SugarAPI: " + ChatFormatting.RED + ChatFormatting.UNDERLINE + version), Util.NIL_UUID);
         }
     }
 
