@@ -2,6 +2,7 @@ package com.thana.sugarapi.common.core;
 
 import com.thana.sugarapi.client.event.handler.ClientEventHandler;
 import com.thana.sugarapi.client.event.handler.ConfigClientEventHandler;
+import com.thana.sugarapi.client.event.launcher.MainEventLauncher;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
 import com.thana.sugarapi.client.keys.ModKeys;
 import com.thana.sugarapi.common.api.oid.OIDUtil;
@@ -39,6 +40,9 @@ public class SugarAPI {
         SugarSettingsScreen.putConfig(SugarAPI.MOD_ID, "SugarAPI");
         OIDUtil.scanPackage(SugarAPI.MACRO_PACKAGE);
         VersionChecker.tryCheck(SugarAPI.MOD_ID, SugarAPI.MOD_VERSION);
+
+        // Event Launcher
+        MainEventLauncher.launch();
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             this.registerKeys();
