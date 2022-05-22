@@ -55,6 +55,7 @@ public class ConfigClientEventHandler {
             switch (event.getKey()) {
                 case "nbtLength" -> event.setReturn("NBT Length");
                 case "showNbt" -> event.setReturn("Show NBT");
+                default -> event.setReturn(this.camelCaseChange(event.getKey()));
             }
         }
         else {
