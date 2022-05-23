@@ -41,7 +41,6 @@ public class SugarAPI {
         OIDUtil.scanPackage(SugarAPI.MACRO_PACKAGE);
         VersionChecker.tryCheck(SugarAPI.MOD_ID, SugarAPI.MOD_VERSION);
 
-        // Event Launcher
         MainEventLauncher.launch();
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
