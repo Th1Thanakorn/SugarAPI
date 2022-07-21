@@ -134,6 +134,14 @@ public class JsonConfig {
         this.config.put(key, object);
     }
 
+    public void putList(String key, HashMap<String, String> values) {
+        JsonObject object = new JsonObject();
+        for (String k : values.keySet()) {
+            object.addProperty(k, values.get(k));
+        }
+        this.config.put(key, object);
+    }
+
     public void createConfigClient() {
         File file = new File(DIR_CLIENT + String.format("%s.json", this.modid));
         JsonObject oldConfig = JsonConfig.readClient(this.modid);
@@ -357,6 +365,15 @@ public class JsonConfig {
         JsonObject object = readClient(modid);
         object.addProperty(key, i);
         updateConfig(modid, object);
+    }
+
+    public static void setList(String modid, String key, HashMap<String, String> set) {
+        JsonObject object = readClient(modid);
+        JsonObject list = new JsonObject();
+        for (String k : set.keySet()) {
+            list.addProperty(k, set.get(k));
+        }
+        object.add(key, list);
     }
 
     public static String getLastOpenedId() {

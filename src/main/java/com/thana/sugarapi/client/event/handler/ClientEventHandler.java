@@ -3,6 +3,7 @@ package com.thana.sugarapi.client.event.handler;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.thana.sugarapi.client.config.ClientConfig;
 import com.thana.sugarapi.client.gui.screen.CommandEditorScreen;
+import com.thana.sugarapi.client.gui.screen.MultiKeyBindsScreen;
 import com.thana.sugarapi.client.gui.screen.SugarSettingsScreen;
 import com.thana.sugarapi.client.gui.widget.button.ItemButton;
 import com.thana.sugarapi.client.gui.widget.button.SugarSettingsButton;
@@ -16,6 +17,7 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.controls.KeyBindsScreen;
 import net.minecraft.client.player.RemotePlayer;
 import net.minecraft.nbt.TextComponentTagVisitor;
 import net.minecraft.network.chat.TextComponent;
@@ -58,6 +60,9 @@ public class ClientEventHandler {
         }
         else if (event.getScreen() instanceof ChatScreen) {
             event.addListener(new ItemButton(width - 26, (int) (height - 34 - this.mc.options.chatHeightFocused), TextComponent.EMPTY, new ItemStack(Items.PAPER), (button) -> this.mc.setScreen(new CommandEditorScreen())));
+        }
+        else if (event.getScreen() instanceof KeyBindsScreen screen) {
+            event.addListener(new ItemButton(width - 24, height - 24, TextWrapper.wrapped("Advanced Key Options"), new ItemStack(Items.REDSTONE), (button) -> this.mc.setScreen(new MultiKeyBindsScreen()), screen));
         }
     }
 

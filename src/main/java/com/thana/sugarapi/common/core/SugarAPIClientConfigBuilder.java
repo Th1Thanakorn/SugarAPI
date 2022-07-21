@@ -3,6 +3,8 @@ package com.thana.sugarapi.common.core;
 import com.thana.sugarapi.client.config.handler.MouseScroll;
 import com.thana.sugarapi.common.utils.JsonConfig;
 
+import java.util.HashMap;
+
 public class SugarAPIClientConfigBuilder {
 
     public static final JsonConfig CONFIG = new JsonConfig(SugarAPI.MOD_ID, SugarAPI.MOD_VERSION);
@@ -20,6 +22,7 @@ public class SugarAPIClientConfigBuilder {
         CONFIG.put("scrollDelta", MouseScroll.SLOW.toString());
         CONFIG.put("showPingText", false);
         CONFIG.put("enablePlayerViewer", true);
+        CONFIG.putList("multiKeys", new HashMap<>());
 
         CONFIG.createConfigClient();
         CONFIG.createKeyLoggerClient();

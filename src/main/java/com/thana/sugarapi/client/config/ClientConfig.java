@@ -1,7 +1,11 @@
 package com.thana.sugarapi.client.config;
 
+import com.google.gson.JsonObject;
 import com.thana.sugarapi.common.core.SugarAPIClientConfigBuilder;
 import com.thana.sugarapi.common.utils.JsonConfig;
+import net.minecraft.Util;
+
+import java.util.HashMap;
 
 public class ClientConfig {
 
@@ -29,5 +33,14 @@ public class ClientConfig {
 
     public static String getString(String key) {
         return CONFIG.getString(key);
+    }
+
+    public static HashMap<String, String> readList(String key) {
+        JsonObject list = CONFIG.getJsonObject(key);
+        return Util.make(new HashMap<>(), (map) -> {
+            for (String k : list.keySet()) {
+                map.put(k, list.get(k).getAsString());
+            }
+        });
     }
 }
