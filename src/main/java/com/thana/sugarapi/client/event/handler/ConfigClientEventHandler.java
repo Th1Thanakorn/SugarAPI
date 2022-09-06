@@ -46,6 +46,9 @@ public class ConfigClientEventHandler {
                 event.setSettingWidget(button);
                 event.setCanceled(true);
             }
+            else if (event.is("multiKeys")) {
+                event.setStop(true);
+            }
         }
     }
 
@@ -56,6 +59,9 @@ public class ConfigClientEventHandler {
                 case "nbtLength" -> event.setReturn("NBT Length");
                 case "showNbt" -> event.setReturn("Show NBT");
                 default -> event.setReturn(this.camelCaseChange(event.getKey()));
+            }
+            if (event.getKey().equals("multiKeys")) {
+                event.setRender(false);
             }
         }
         else {

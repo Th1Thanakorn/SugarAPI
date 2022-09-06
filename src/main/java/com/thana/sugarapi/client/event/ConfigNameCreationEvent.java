@@ -9,6 +9,7 @@ public class ConfigNameCreationEvent extends Event {
     private final String key;
     private final String modid;
     private String ret;
+    private boolean render = true;
 
     public ConfigNameCreationEvent(String modid, String key) {
         this.modid = modid;
@@ -30,5 +31,13 @@ public class ConfigNameCreationEvent extends Event {
 
     public boolean sameMod(String modid) {
         return this.modid.equals(modid);
+    }
+
+    public void setRender(boolean render) {
+        this.render = render;
+    }
+
+    public boolean shouldRender() {
+        return this.render;
     }
 }

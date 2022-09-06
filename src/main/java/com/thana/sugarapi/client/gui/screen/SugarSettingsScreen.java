@@ -151,6 +151,9 @@ public class SugarSettingsScreen extends Screen {
             for (String key : object.keySet()) {
                 ConfigNameCreationEvent event = new ConfigNameCreationEvent(this.shownModId, key);
                 MinecraftForge.EVENT_BUS.post(event);
+                if (!event.shouldRender()) {
+                    continue;
+                }
                 String obfKey = event.isCanceled() ? event.getReturn() : key;
                 this.font.drawShadow(poseStack, this.getHeaderFormatting() + obfKey, (float) (this.editorX + 6), (float) (this.editorY + 12 + i * 24 - this.scrollDelta), 16777215);
                 i++;
@@ -330,6 +333,7 @@ public class SugarSettingsScreen extends Screen {
                 MinecraftForge.EVENT_BUS.post(creationEvent);
                 MinecraftForge.EVENT_BUS.post(jobEvent);
                 Runnable customJob = jobEvent.getJob();
+                if (creationEvent.isStopped()) continue;
                 if (creationEvent.isCanceled()) {
                     AbstractWidget setting = creationEvent.getSetting();
                     if (setting != null) {

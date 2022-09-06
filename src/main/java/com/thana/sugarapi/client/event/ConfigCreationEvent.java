@@ -16,6 +16,7 @@ public class ConfigCreationEvent extends Event {
     private final int width;
     private final int height;
     private AbstractWidget setting = null;
+    private boolean stopped = false;
 
     public ConfigCreationEvent(String modid, String key, JsonElement value, int x, int y, int width, int height) {
         this.modid = modid;
@@ -69,5 +70,13 @@ public class ConfigCreationEvent extends Event {
 
     public AbstractWidget getSetting() {
         return setting;
+    }
+
+    public boolean isStopped() {
+        return this.stopped;
+    }
+
+    public void setStop(boolean stopped) {
+        this.stopped = stopped;
     }
 }

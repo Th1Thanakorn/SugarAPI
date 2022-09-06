@@ -2,11 +2,9 @@ package com.thana.sugarapi.client.gui.widget;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.thana.sugarapi.client.config.ClientConfig;
 import com.thana.sugarapi.client.gui.screen.MultiKeyBindsScreen;
 import com.thana.sugarapi.common.utils.TextWrapper;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -17,7 +15,6 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,22 +26,6 @@ import java.util.*;
 
 public class ButtonSelectionList extends ContainerObjectSelectionList<ButtonSelectionList.Entry> {
 
-    private final HashMap<KeyMapping, int[]> keys = Util.make(new HashMap<>(), (map) -> {
-        HashMap<String, String> multiKeys = ClientConfig.readList("multiKeys");
-        for (String key : multiKeys.keySet()) {
-            for (KeyMapping mapping : this.minecraft.options.keyMappings) {
-                if ((mapping.getName()).equals(key)) {
-                    String[] numKeys = multiKeys.get(key).split(",");
-                    int[] keySet = new int[numKeys.length];
-                    for (int i = 0; i < numKeys.length; i++) {
-                        keySet[i] = Integer.parseInt(numKeys[i]);
-                    }
-                    map.put(mapping, keySet);
-                    break;
-                }
-            }
-        }
-    });
     private final MultiKeyBindsScreen screen;
     private int maxNameWidth;
 
@@ -90,16 +71,16 @@ public class ButtonSelectionList extends ContainerObjectSelectionList<ButtonSele
         private final Component name;
         private final int width;
 
-        public CategoryEntry(Component p_193886_) {
-            this.name = p_193886_;
+        public CategoryEntry(Component component) {
+            this.name = component;
             this.width = ButtonSelectionList.this.minecraft.font.width(this.name);
         }
 
-        public void render(PoseStack poseStack, int len, int qy, int qx, int p_193892_, int p_193893_, int mouseX, int mouseY, boolean p_193896_, float partialTicks) {
+        public void render(PoseStack poseStack, int len, int qy, int qx, int p_193892_, int p_193893_, int mouseX, int mouseY, boolean focusing, float partialTicks) {
             ButtonSelectionList.this.minecraft.font.draw(poseStack, this.name, (float)(ButtonSelectionList.this.minecraft.screen.width / 2 - this.width / 2), (float)(qy + p_193893_ - 9 - 1), 16777215);
         }
 
-        public boolean changeFocus(boolean p_193900_) {
+        public boolean changeFocus(boolean focused) {
             return false;
         }
 
@@ -129,11 +110,12 @@ public class ButtonSelectionList extends ContainerObjectSelectionList<ButtonSele
         private final Component name;
         private final Button showButton;
         private final Button addButton;
+        private final Button removeButton;
 
         public KeyEntry(KeyMapping keyMapping, Component name) {
             this.keyMapping = keyMapping;
             this.name = name;
-            this.showButton = new Button(0, 0, 75, 20, name, (button) -> ButtonSelectionList.this.screen.selectedKey = keyMapping) {
+            this.showButton = new Button(0, 0, 75, 20, name, (button) -> ButtonSelectionList.this.screen.selectedButton = button) {
 
                 @NotNull
                 public MutableComponent createNarrationMessage() {
@@ -141,17 +123,24 @@ public class ButtonSelectionList extends ContainerObjectSelectionList<ButtonSele
                 }
             };
 
-            this.addButton = new Button(75 + 6, 0, 20, 20, TextWrapper.wrapped("+"), (button) -> {});
+            this.addButton = new Button(75 + 6, 0, 20, 20, TextWrapper.wrapped("+"), (button) -> {
+                ButtonSelectionList.this.screen.selectedAddKey = keyMapping;
+                ButtonSelectionList.this.screen.selectedButton = this.showButton;
+            });
+            this.removeButton = new Button(101 + 6, 0, 20, 20, TextWrapper.wrapped("-"), (button) -> {
+                ButtonSelectionList.this.screen.selectedRemoveKey = keyMapping;
+                ButtonSelectionList.this.screen.selectedButton = this.showButton;
+            });
         }
 
         @Override
         public List<? extends GuiEventListener> children() {
-            return List.of(this.showButton);
+            return List.of(this.showButton, this.addButton, this.removeButton);
         }
 
         @Override
         public List<? extends NarratableEntry> narratables() {
-            return List.of(this.showButton);
+            return List.of(this.showButton, this.addButton, this.removeButton);
         }
 
         @Override
@@ -169,17 +158,26 @@ public class ButtonSelectionList extends ContainerObjectSelectionList<ButtonSele
 
         @Override
         public void render(PoseStack poseStack, int len, int qy, int qx, int st, int ug, int mouseX, int mouseY, boolean p_93531_, float partialTicks) {
-            boolean flag = ButtonSelectionList.this.screen.selectedKey == this.keyMapping;
+            boolean selectedAdd = ButtonSelectionList.this.screen.selectedAddKey == this.keyMapping;
+            boolean selectedRemove = ButtonSelectionList.this.screen.selectedRemoveKey == this.keyMapping;
             ArrayList<Integer> keys = new ArrayList<>();
-            if (ButtonSelectionList.this.keys.containsKey(this.keyMapping)) {
-                for (int i : ButtonSelectionList.this.keys.get(this.keyMapping)) {
+            if (ButtonSelectionList.this.screen.keys.containsKey(this.keyMapping)) {
+                for (int i : ButtonSelectionList.this.screen.keys.get(this.keyMapping)) {
                     keys.add(i);
                 }
             }
             float f = (float)(qx + 90 - ButtonSelectionList.this.maxNameWidth);
             ButtonSelectionList.this.minecraft.font.draw(poseStack, this.name, f, (float)(qy + ug / 2 - 9 / 2), 16777215);
+
             this.showButton.x = qx + 105;
             this.showButton.y = qy;
+
+            this.addButton.x = qx + 105 + 81;
+            this.addButton.y = qy;
+
+            this.removeButton.x = qx + 105 + 107;
+            this.removeButton.y = qy;
+
             this.showButton.setMessage(keys.isEmpty() ? TextWrapper.wrapped(ChatFormatting.RED + "NONE") : this.formatKeys(keys));
             boolean flag1 = false;
             boolean keyCodeModifierConflict = true;
@@ -191,13 +189,34 @@ public class ButtonSelectionList extends ContainerObjectSelectionList<ButtonSele
                     }
                 }
             }
-            if (flag) {
-                this.showButton.setMessage((new TextComponent("> ")).append(this.showButton.getMessage().copy().withStyle(ChatFormatting.YELLOW)).append(" <").withStyle(ChatFormatting.YELLOW));
+
+            // Selected Add
+            if (selectedAdd) {
+                this.addButton.setMessage(this.addButton.getMessage().copy().withStyle(ChatFormatting.YELLOW));
             }
-            else if (flag1) {
+            else {
+                this.addButton.setMessage(this.addButton.getMessage().copy().withStyle(ChatFormatting.WHITE));
+            }
+
+            // Selected Remove
+            if (selectedRemove) {
+                this.removeButton.setMessage(this.removeButton.getMessage().copy().withStyle(ChatFormatting.YELLOW));
+            }
+            else {
+                this.removeButton.setMessage(this.removeButton.getMessage().copy().withStyle(ChatFormatting.WHITE));
+            }
+
+            if (flag1) {
                 this.showButton.setMessage(this.showButton.getMessage().copy().withStyle(keyCodeModifierConflict ? ChatFormatting.GOLD : ChatFormatting.RED));
             }
             this.showButton.render(poseStack, mouseX, mouseY, partialTicks);
+            this.addButton.render(poseStack, mouseX, mouseY, partialTicks);
+            this.removeButton.render(poseStack, mouseX, mouseY, partialTicks);
+        }
+
+        @Override
+        public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+            return super.keyReleased(keyCode, scanCode, modifiers);
         }
 
         private Component formatKeys(ArrayList<Integer> keys) {

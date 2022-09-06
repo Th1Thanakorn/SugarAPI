@@ -374,6 +374,7 @@ public class JsonConfig {
             list.addProperty(k, set.get(k));
         }
         object.add(key, list);
+        updateConfig(modid, object);
     }
 
     public static String getLastOpenedId() {
