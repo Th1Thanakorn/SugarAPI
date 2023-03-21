@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
 import java.util.HashMap;
