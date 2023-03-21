@@ -41,10 +41,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,15 +70,19 @@ public abstract class MixinDebugScreenOverlay {
     private static final ChatFormatting JAVA_VERSION_FORMAT = ChatFormatting.AQUA;
     private static final ChatFormatting TARGETED_FORMAT = ChatFormatting.AQUA;
     private static final ChatFormatting COMMON_VALUE_FORMAT = ChatFormatting.GREEN;
-    private static final ChatFormatting MOOD_FORMAT = ChatFormatting.GRAY;
+    private static final ChatFormatting MOOD_FORMAT = ChatFormatting.AQUA;
     private static final ChatFormatting LOADING_CONDITION_FORMAT = ChatFormatting.RED;
     private static final ChatFormatting DIMENSION_FORMAT = ChatFormatting.DARK_AQUA;
     private static final ChatFormatting DELIMITER = ChatFormatting.GOLD;
-    private static final ChatFormatting LIGHT_SKY = ChatFormatting.DARK_GREEN;
-    private static final ChatFormatting LIGHT_BLOCK = ChatFormatting.GREEN;
+    private static final ChatFormatting LIGHT_SKY = ChatFormatting.YELLOW;
+    private static final ChatFormatting LIGHT_BLOCK = ChatFormatting.GOLD;
     private static final ChatFormatting INT_VALUE_FORMAT = ChatFormatting.YELLOW;
     private static final ChatFormatting SIMPLE_STRING_FORMAT = ChatFormatting.YELLOW;
     private static final ChatFormatting RESET = ChatFormatting.WHITE;
+    private static final ChatFormatting DIRECTION = ChatFormatting.LIGHT_PURPLE;
+    private static final ChatFormatting DAY_COUNT = ChatFormatting.AQUA;
+    private static final ChatFormatting ROTATION = ChatFormatting.AQUA;
+
 
     /**
      * @author Thana
@@ -101,7 +102,7 @@ public abstract class MixinDebugScreenOverlay {
         }
         BlockPos blockpos = this.minecraft.getCameraEntity().blockPosition();
         if (this.minecraft.showOnlyReducedInfo()) {
-            return Lists.newArrayList("Minecraft " + COMMON_VALUE_FORMAT + SharedConstants.getCurrentVersion().getName() + RESET + " (" + SIMPLE_STRING_FORMAT + this.minecraft.getLaunchedVersion() + DELIMITER + "/" + SIMPLE_STRING_FORMAT + ClientBrandRetriever.getClientModName() + RESET + ")", COMMON_VALUE_FORMAT + this.minecraft.fpsString, s, this.minecraft.levelRenderer.getChunkStatistics(), this.minecraft.levelRenderer.getEntityStatistics(), "P: " + INT_VALUE_FORMAT + this.minecraft.particleEngine.countParticles() + RESET + ". T: " + INT_VALUE_FORMAT + this.minecraft.level.getEntityCount(), this.minecraft.level.gatherChunkSourceStats(), "", String.format("Chunk-relative: %d %d %d", blockpos.getX() & 15, blockpos.getY() & 15, blockpos.getZ() & 15));
+            return formatDelimiter(Lists.newArrayList("Minecraft " + COMMON_VALUE_FORMAT + SharedConstants.getCurrentVersion().getName() + RESET + " (" + SIMPLE_STRING_FORMAT + this.minecraft.getLaunchedVersion() + DELIMITER + "/" + SIMPLE_STRING_FORMAT + ClientBrandRetriever.getClientModName() + RESET + ")", COMMON_VALUE_FORMAT + this.minecraft.fpsString, s, this.minecraft.levelRenderer.getChunkStatistics(), this.minecraft.levelRenderer.getEntityStatistics(), "P: " + INT_VALUE_FORMAT + this.minecraft.particleEngine.countParticles() + RESET + ". T: " + INT_VALUE_FORMAT + this.minecraft.level.getEntityCount(), this.minecraft.level.gatherChunkSourceStats(), "", String.format("Chunk-relative: %d %d %d", blockpos.getX() & 15, blockpos.getY() & 15, blockpos.getZ() & 15)));
         }
         else {
             Entity entity = this.minecraft.getCameraEntity();
@@ -120,17 +121,17 @@ public abstract class MixinDebugScreenOverlay {
             }
             Level level = this.getLevel();
             LongSet longset = level instanceof ServerLevel ? ((ServerLevel)level).getForcedChunks() : LongSets.EMPTY_SET;
-            List<String> list = Lists.newArrayList("Minecraft " + SharedConstants.getCurrentVersion().getName() + " (" + this.minecraft.getLaunchedVersion() + "/" + ClientBrandRetriever.getClientModName() + ("release".equalsIgnoreCase(this.minecraft.getVersionType()) ? "" : "/" + this.minecraft.getVersionType()) + ")", this.minecraft.fpsString, s, this.minecraft.levelRenderer.getChunkStatistics(), this.minecraft.levelRenderer.getEntityStatistics(), "P: " + this.minecraft.particleEngine.countParticles() + ". T: " + this.minecraft.level.getEntityCount(), this.minecraft.level.gatherChunkSourceStats());
+            List<String> list = Lists.newArrayList("Minecraft " + COMMON_VALUE_FORMAT + SharedConstants.getCurrentVersion().getName() + RESET + " (" + SIMPLE_STRING_FORMAT + this.minecraft.getLaunchedVersion() + DELIMITER + "/" + SIMPLE_STRING_FORMAT + ClientBrandRetriever.getClientModName() + ("release".equalsIgnoreCase(this.minecraft.getVersionType()) ? "" : "/" + this.minecraft.getVersionType()) + RESET + ")", COMMON_VALUE_FORMAT + this.minecraft.fpsString, s, this.minecraft.levelRenderer.getChunkStatistics(), this.minecraft.levelRenderer.getEntityStatistics(), "P: " + INT_VALUE_FORMAT + this.minecraft.particleEngine.countParticles() + RESET + ". T: " + INT_VALUE_FORMAT + this.minecraft.level.getEntityCount(), this.minecraft.level.gatherChunkSourceStats());
             String s2 = this.getServerChunkStats();
             if (s2 != null) {
                 list.add(s2);
             }
             list.add(DIMENSION_FORMAT.toString() + this.minecraft.level.dimension().location() + ChatFormatting.WHITE + " FC: " + INT_VALUE_FORMAT + longset.size());
             list.add("");
-            list.add("XYZ:" + TARGETED_FORMAT + String.format(Locale.ROOT, " %.3f / %.5f / %.3f", this.minecraft.getCameraEntity().getX(), this.minecraft.getCameraEntity().getY(), this.minecraft.getCameraEntity().getZ()));
+            list.add("XYZ:" + String.format(Locale.ROOT, TARGETED_FORMAT + " %.3f" + RESET + " / " + TARGETED_FORMAT + "%.5f" + RESET + " / " + TARGETED_FORMAT + "%.3f" + RESET, this.minecraft.getCameraEntity().getX(), this.minecraft.getCameraEntity().getY(), this.minecraft.getCameraEntity().getZ()));
             list.add("Block:" + TARGETED_FORMAT + String.format(" %d %d %d [%d %d %d]", blockpos.getX(), blockpos.getY(), blockpos.getZ(), blockpos.getX() & 15, blockpos.getY() & 15, blockpos.getZ() & 15));
             list.add("Chunk:" + TARGETED_FORMAT + String.format(" %d %d %d [%d %d in r.%d.%d.mca]", chunkpos.x, SectionPos.blockToSectionCoord(blockpos.getY()), chunkpos.z, chunkpos.getRegionLocalX(), chunkpos.getRegionLocalZ(), chunkpos.getRegionX(), chunkpos.getRegionZ()));
-            list.add(String.format(Locale.ROOT, "Facing: %s (%s) (%.1f / %.1f)", direction, s1, Mth.wrapDegrees(entity.getYRot()), Mth.wrapDegrees(entity.getXRot())));
+            list.add(String.format(Locale.ROOT, "Facing: " + DIRECTION + "%s" + RESET + " (%s) (" + ROTATION + "%.1f" + RESET + " /" + ROTATION + "%.1f" + RESET + ")", direction, s1, Mth.wrapDegrees(entity.getYRot()), Mth.wrapDegrees(entity.getXRot())));
             LevelChunk levelchunk = this.getClientChunk();
             if (levelchunk.isEmpty()) {
                 list.add(LOADING_CONDITION_FORMAT + "Waiting for chunk...");
@@ -138,13 +139,13 @@ public abstract class MixinDebugScreenOverlay {
                 int i = this.minecraft.level.getChunkSource().getLightEngine().getRawBrightness(blockpos, 0);
                 int j = this.minecraft.level.getBrightness(LightLayer.SKY, blockpos);
                 int k = this.minecraft.level.getBrightness(LightLayer.BLOCK, blockpos);
-                list.add("Client Light: " + i + DELIMITER + " (" + LIGHT_SKY + j + " sky" + DELIMITER + ", " + LIGHT_BLOCK + k + " block" + DELIMITER + ")");
+                list.add("Client Light: " + ChatFormatting.GREEN + i + RESET + DELIMITER + " (" + LIGHT_SKY + j + " sky" + DELIMITER + ", " + LIGHT_BLOCK + k + " block" + DELIMITER + ")");
                 LevelChunk levelchunk1 = this.getServerChunk();
                 StringBuilder stringbuilder = new StringBuilder("CH");
 
-                for(Heightmap.Types heightmap$types : Heightmap.Types.values()) {
+                for (Heightmap.Types heightmap$types : Heightmap.Types.values()) {
                     if (heightmap$types.sendToClient()) {
-                        stringbuilder.append(" ").append(HEIGHTMAP_NAMES.get(heightmap$types)).append(": ").append(levelchunk.getHeight(heightmap$types, blockpos.getX(), blockpos.getZ()));
+                        stringbuilder.append(" ").append(HEIGHTMAP_NAMES.get(heightmap$types)).append(": ").append(INT_VALUE_FORMAT).append(levelchunk.getHeight(heightmap$types, blockpos.getX(), blockpos.getZ())).append(RESET);
                     }
                 }
 
@@ -156,9 +157,9 @@ public abstract class MixinDebugScreenOverlay {
                     if (heightmap$types1.keepAfterWorldgen()) {
                         stringbuilder.append(" ").append(HEIGHTMAP_NAMES.get(heightmap$types1)).append(": ");
                         if (levelchunk1 != null) {
-                            stringbuilder.append(levelchunk1.getHeight(heightmap$types1, blockpos.getX(), blockpos.getZ()));
+                            stringbuilder.append(INT_VALUE_FORMAT).append(levelchunk1.getHeight(heightmap$types1, blockpos.getX(), blockpos.getZ())).append(RESET);
                         } else {
-                            stringbuilder.append("??");
+                            stringbuilder.append(LOADING_CONDITION_FORMAT).append("??").append(RESET);
                         }
                     }
                 }
@@ -174,7 +175,7 @@ public abstract class MixinDebugScreenOverlay {
                     }
 
                     DifficultyInstance difficultyinstance = new DifficultyInstance(level.getDifficulty(), level.getDayTime(), l, f2);
-                    list.add(String.format(Locale.ROOT, "Local Difficulty: %.2f // %.2f (Day %d)", difficultyinstance.getEffectiveDifficulty(), difficultyinstance.getSpecialMultiplier(), this.minecraft.level.getDayTime() / 24000L));
+                    list.add(String.format(Locale.ROOT, "Local Difficulty: %.2f // %.2f (Day " + DAY_COUNT + "%d" + RESET + ")", difficultyinstance.getEffectiveDifficulty(), difficultyinstance.getSpecialMultiplier(), this.minecraft.level.getDayTime() / 24000L));
                 }
             }
 
@@ -190,11 +191,9 @@ public abstract class MixinDebugScreenOverlay {
                 if (naturalspawner$spawnstate != null) {
                     Object2IntMap<MobCategory> object2intmap = naturalspawner$spawnstate.getMobCategoryCounts();
                     int i1 = naturalspawner$spawnstate.getSpawnableChunkCount();
-                    list.add("SC: " + i1 + ", " + Stream.of(MobCategory.values()).map((p_94068_) -> {
-                        return Character.toUpperCase(p_94068_.getName().charAt(0)) + ": " + object2intmap.getInt(p_94068_);
-                    }).collect(Collectors.joining(", ")));
+                    list.add("SC: "+ INT_VALUE_FORMAT + i1 + RESET + ", " + Stream.of(MobCategory.values()).map((category) -> Character.toUpperCase(category.getName().charAt(0)) + ": " + INT_VALUE_FORMAT + object2intmap.getInt(category) + RESET).collect(Collectors.joining(", ")));
                 } else {
-                    list.add("SC: N/A");
+                    list.add("SC: " + LOADING_CONDITION_FORMAT + "N/A");
                 }
             }
 
@@ -204,7 +203,7 @@ public abstract class MixinDebugScreenOverlay {
             }
 
             list.add(this.minecraft.getSoundManager().getDebugString() + String.format(" (Mood %s%%", MOOD_FORMAT.toString() + Math.round(this.minecraft.player.getCurrentMood() * 100.0F)) + ChatFormatting.WHITE + ")");
-            return list;
+            return formatDelimiter(list);
         }
     }
 
@@ -218,7 +217,7 @@ public abstract class MixinDebugScreenOverlay {
         long j = Runtime.getRuntime().totalMemory();
         long k = Runtime.getRuntime().freeMemory();
         long l = j - k;
-        List<String> list = Lists.newArrayList(String.format("Java: %s %sbit", JAVA_VERSION_FORMAT + System.getProperty("java.version"), (this.minecraft.is64Bit() ? 64 : 32)), String.format("Mem: % 2d%% %03d/%03dMB", l * 100L / i, bytesToMegabytes(l), bytesToMegabytes(i)), String.format("Allocated: % 2d%% %03dMB", j * 100L / i, bytesToMegabytes(j)), "", String.format("CPU: %s", GlUtil.getCpuInfo()), "", String.format("Display: %dx%d (%s)", Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), GlUtil.getVendor()), GlUtil.getRenderer(), GlUtil.getOpenGLVersion());
+        List<String> list = Lists.newArrayList(String.format("Java: %s %sbit", JAVA_VERSION_FORMAT + System.getProperty("java.version"), (this.minecraft.is64Bit() ? 64 : 32)), String.format("Mem: % " + "2d%%" + " %03d/%03dMB", l * 100L / i, bytesToMegabytes(l), bytesToMegabytes(i)), String.format("Allocated: % " + "2d%%" + "%03dMB", j * 100L / i, bytesToMegabytes(j)), "", String.format("CPU: %s", GlUtil.getCpuInfo()), "", String.format("Display: %dx%d (%s)", Minecraft.getInstance().getWindow().getWidth(), Minecraft.getInstance().getWindow().getHeight(), GlUtil.getVendor()), GlUtil.getRenderer(), GlUtil.getOpenGLVersion());
         if (!this.minecraft.showOnlyReducedInfo()) {
             if (this.block.getType() == HitResult.Type.BLOCK) {
                 BlockPos blockpos = ((BlockHitResult) this.block).getBlockPos();
@@ -255,5 +254,17 @@ public abstract class MixinDebugScreenOverlay {
 
     private static long bytesToMegabytes(long bytes) {
         return bytes / 1024L / 1024L;
+    }
+
+    private static List<String> formatDelimiter(List<String> list) {
+        ArrayList<String> formattedList = new ArrayList<>();
+        list.forEach((text) -> {
+            text = text.replaceAll("\\(", DELIMITER + "(" + RESET);
+            text = text.replaceAll("\\)", DELIMITER + ")" + RESET);
+            text = text.replaceAll("/", DELIMITER + "/" + RESET);
+            text = text.replaceAll(",", DELIMITER + "," + RESET);
+            formattedList.add(text);
+        });
+        return formattedList;
     }
 }
